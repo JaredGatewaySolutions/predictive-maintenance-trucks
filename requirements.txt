@@ -9,22 +9,27 @@ numpy
 scikit-learn
 xgboost
 
-# Time Series Analysis
-statsmodels
+# Explainability (CRITICAL for Army XEM)
+shap
+eli5
 
-# Survival Analysis
+# Imbalance Handling
+imbalanced-learn
+
+# Survival Analysis (for risk factor analysis)
 lifelines
 
-# Optional but recommended
+# Visualization
 matplotlib
 seaborn
+plotly
+
+# Optional Development Tools
 jupyter
 jupyterlab
 
-# For production deployment
-flask
-fastapi
-uvicorn
-
 # Progress bars
 tqdm
+
+# REMOVED: statsmodels (ARIMA not needed for this use case)
+# REMOVED: flask, fastapi, uvicorn (API/UI not needed yet)
