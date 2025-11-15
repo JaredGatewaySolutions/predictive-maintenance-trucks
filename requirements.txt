@@ -30,3 +30,7 @@ jupyterlab
 
 # Progress bars
 tqdm
+
+# API
+fastapi
+uvicorn
