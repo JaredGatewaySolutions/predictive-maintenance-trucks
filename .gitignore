@@ -206,5 +206,37 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-# Project Data
-data/*
+# Project Data - Updated for fullstack architecture
+# Keep structure, ignore large files and sensitive data
+
+# Raw data (large CSV files)
+data/raw/*.csv
+
+# Processed data
+data/processed/*
+!data/processed/.gitkeep
+
+# Models (keep registry and structure, ignore model files)
+data/models/*/model.pkl
+data/models/*/scaler.pkl
+data/models/*/*.pkl
+!data/models/registry.json
+!data/models/.gitkeep
+
+# Predictions (potentially sensitive, ignore JSON files)
+data/predictions/*.json
+!data/predictions/.gitkeep
+
+# Cache (temporary files)
+data/cache/*
+!data/cache/.gitkeep
+
+# Frontend build artifacts (for future Angular app)
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/*.log
+
+# API cache and logs
+api/__pycache__/
+*.log

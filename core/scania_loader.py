@@ -13,7 +13,7 @@ import pandas as pd
 import numpy as np
 import os
 
-def load_scania_data(data_dir='data/raw'):
+def load_scania_data(data_dir='data'):
     """
     Load SCANIA Component X dataset files.
     
