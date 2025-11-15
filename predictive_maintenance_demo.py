@@ -38,38 +38,19 @@ from sklearn.metrics import (
 # Classification models
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.linear_model import LogisticRegression
-
-try:
-    import xgboost as xgb
-
-    XGBOOST_AVAILABLE = True
-except ImportError:
-    XGBOOST_AVAILABLE = False
-    print("Warning: XGBoost not installed. Install with: pip install xgboost")
+import xgboost as xgb
 
 # Regression models
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.ensemble import GradientBoostingRegressor
 
 # Time series
-try:
-    from statsmodels.tsa.arima.model import ARIMA
-    from statsmodels.tsa.stattools import adfuller
-
-    STATSMODELS_AVAILABLE = True
-except ImportError:
-    STATSMODELS_AVAILABLE = False
-    print("Warning: statsmodels not installed. Install with: pip install statsmodels")
+from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.stattools import adfuller
 
 # Survival analysis
-try:
-    from lifelines import KaplanMeierFitter, CoxPHFitter, WeibullFitter
-    from lifelines.statistics import logrank_test
-
-    LIFELINES_AVAILABLE = True
-except ImportError:
-    LIFELINES_AVAILABLE = False
-    print("Warning: lifelines not installed. Install with: pip install lifelines")
+from lifelines import KaplanMeierFitter, CoxPHFitter, WeibullFitter
+from lifelines.statistics import logrank_test
 
 warnings.filterwarnings("ignore")
 
@@ -269,7 +250,7 @@ class PredictiveMaintenanceAnalyzer:
         models = {}
 
         # Progress tracking
-        model_count = 4 if XGBOOST_AVAILABLE else 3
+        model_count = 4
         print("\nTraining classification models...")
         pbar = tqdm(total=model_count, desc="Models", unit="model")
 
@@ -308,12 +289,10 @@ class PredictiveMaintenanceAnalyzer:
         section.append("Strength: Handles non-linear relationships, robust to outliers")
         section.append("Key for DoD: Provides feature importance for explainability")
 
-        
         print(
             "\n  Training Random Forest (this may take a while for large datasets)..."
         )
 
-        
         rf = RandomForestClassifier(
             n_estimators=100, max_depth=10, random_state=42, n_jobs=-1
         )
@@ -359,37 +338,34 @@ class PredictiveMaintenanceAnalyzer:
         section.append(f"  - Test Accuracy: {gb.score(X_test, y_test):.4f}")
         section.append(f"  - AUC-ROC: {roc_auc_score(y_test, y_proba_gb):.4f}")
 
-        # 4. XGBoost (if available)
-        if XGBOOST_AVAILABLE:
-            section.append("\n" + "-" * 80)
-            section.append("4. XGBOOST")
-            section.append("-" * 80)
-            section.append("Purpose: Optimized gradient boosting, industry standard")
-            section.append(
-                "Strength: Fast, handles missing values, excellent performance"
-            )
+        # 4. XGBoost
+        section.append("\n" + "-" * 80)
+        section.append("4. XGBOOST")
+        section.append("-" * 80)
+        section.append("Purpose: Optimized gradient boosting, industry standard")
+        section.append("Strength: Fast, handles missing values, excellent performance")
 
-            print("\n  Training XGBoost...")
-            xgb_model = xgb.XGBClassifier(
-                n_estimators=100,
-                max_depth=5,
-                random_state=42,
-                eval_metric="logloss",
-                use_label_encoder=False,
-            )
-            xgb_model.fit(X_train, y_train)
-            models["XGBoost"] = xgb_model
-            pbar.update(1)
+        print("\n  Training XGBoost...")
+        xgb_model = xgb.XGBClassifier(
+            n_estimators=100,
+            max_depth=5,
+            random_state=42,
+            eval_metric="logloss",
+            use_label_encoder=False,
+        )
+        xgb_model.fit(X_train, y_train)
+        models["XGBoost"] = xgb_model
+        pbar.update(1)
 
-            y_pred_xgb = xgb_model.predict(X_test)
-            y_proba_xgb = xgb_model.predict_proba(X_test)[:, 1]
+        y_pred_xgb = xgb_model.predict(X_test)
+        y_proba_xgb = xgb_model.predict_proba(X_test)[:, 1]
 
-            section.append(f"\nResults:")
-            section.append(
-                f"  - Training Accuracy: {xgb_model.score(X_train, y_train):.4f}"
-            )
-            section.append(f"  - Test Accuracy: {xgb_model.score(X_test, y_test):.4f}")
-            section.append(f"  - AUC-ROC: {roc_auc_score(y_test, y_proba_xgb):.4f}")
+        section.append(f"\nResults:")
+        section.append(
+            f"  - Training Accuracy: {xgb_model.score(X_train, y_train):.4f}"
+        )
+        section.append(f"  - Test Accuracy: {xgb_model.score(X_test, y_test):.4f}")
+        section.append(f"  - AUC-ROC: {roc_auc_score(y_test, y_proba_xgb):.4f}")
 
         pbar.close()
 
@@ -637,16 +613,6 @@ class PredictiveMaintenanceAnalyzer:
         Perform survival analysis - predict time until failure.
         Key for DoD: "What's the probability this vehicle makes it through a 90-day deployment?"
         """
-        if not LIFELINES_AVAILABLE:
-            section = []
-            section.append("\n" + "=" * 80)
-            section.append("SURVIVAL ANALYSIS - TIME-TO-FAILURE")
-            section.append("=" * 80)
-            section.append("\n⚠ lifelines library not installed")
-            section.append("Install with: pip install lifelines")
-            self.report_sections.append("\n".join(section))
-            print("\n".join(section))
-            return
 
         section = []
         section.append("\n" + "=" * 80)
@@ -843,85 +809,33 @@ class PredictiveMaintenanceAnalyzer:
         train = ts_df[:train_size]
         test = ts_df[train_size:]
 
-        if STATSMODELS_AVAILABLE:
-            # 1. ARIMA Model
-            section.append("\n" + "-" * 80)
-            section.append("1. ARIMA (AutoRegressive Integrated Moving Average)")
-            section.append("-" * 80)
-            section.append("Purpose: Classic time series forecasting")
-            section.append("Strength: Captures trends, seasonality, autocorrelation")
-
-            try:
-                # Fit ARIMA model
-                model = ARIMA(train["failures"], order=(1, 1, 1))
-                arima_fit = model.fit()
-
-                # Forecast
-                forecast = arima_fit.forecast(steps=len(test))
-
-                # Calculate accuracy
-                mae = mean_absolute_error(test["failures"], forecast)
-                rmse = np.sqrt(mean_squared_error(test["failures"], forecast))
-
-                section.append(f"\nResults:")
-                section.append(f"  - MAE: {mae:.3f}")
-                section.append(f"  - RMSE: {rmse:.3f}")
-                section.append(f"  - Next 7 days forecast:")
-                for i, val in enumerate(forecast[:7], 1):
-                    section.append(f"    Day {i}: {val:.2f} expected failures")
-            except Exception as e:
-                section.append(f"\nARIMA fitting error: {str(e)}")
-        else:
-            section.append("\n⚠ statsmodels not installed for ARIMA")
-            section.append("Install with: pip install statsmodels")
-
-        # Simple Moving Average (always available)
+        # 1. ARIMA Model
         section.append("\n" + "-" * 80)
-        section.append("2. MOVING AVERAGE BASELINE")
+        section.append("1. ARIMA (AutoRegressive Integrated Moving Average)")
         section.append("-" * 80)
-        section.append("Purpose: Simple baseline forecast")
+        section.append("Purpose: Classic time series forecasting")
+        section.append("Strength: Captures trends, seasonality, autocorrelation")
 
-        window = 7
-        ma_forecast = train["failures"].rolling(window=window).mean().iloc[-1]
+        try:
+            # Fit ARIMA model
+            model = ARIMA(train["failures"], order=(1, 1, 1))
+            arima_fit = model.fit()
 
-        section.append(f"\n{window}-Day Moving Average Forecast:")
-        section.append(f"  - Predicted value: {ma_forecast:.2f}")
-        section.append(f"  - Actual next value: {test['failures'].iloc[0]:.2f}")
-        section.append(f"  - Error: {abs(ma_forecast - test['failures'].iloc[0]):.2f}")
+            # Forecast
+            forecast = arima_fit.forecast(steps=len(test))
 
-        # Practical Applications
-        section.append("\n" + "-" * 80)
-        section.append("MILITARY/DOD APPLICATIONS")
-        section.append("-" * 80)
-        section.append("\n✓ Budget Planning:")
-        section.append("  'Forecast maintenance costs for next fiscal year'")
-        section.append(
-            "  Use ARIMA to predict failure rates → estimate parts & labor costs"
-        )
+            # Calculate accuracy
+            mae = mean_absolute_error(test["failures"], forecast)
+            rmse = np.sqrt(mean_squared_error(test["failures"], forecast))
 
-        section.append("\n✓ Readiness Forecasting:")
-        section.append("  'Predict vehicle availability for upcoming exercises'")
-        section.append(
-            "  Model seasonal patterns (e.g., increased failures in summer heat)"
-        )
-
-        section.append("\n✓ Supply Chain:")
-        section.append("  'How many spare parts to stock next quarter?'")
-        section.append("  Forecast demand based on historical failure patterns")
-
-        section.append("\n✓ Mission Planning:")
-        section.append("  'Identify high-risk periods for equipment failures'")
-        section.append(
-            "  Schedule critical missions during predicted low-failure periods"
-        )
-
-        self.results["time_series"] = {
-            "data": ts_df,
-            "forecast": forecast if STATSMODELS_AVAILABLE else None,
-        }
-
-        self.report_sections.append("\n".join(section))
-        print("\n".join(section))
+            section.append(f"\nResults:")
+            section.append(f"  - MAE: {mae:.3f}")
+            section.append(f"  - RMSE: {rmse:.3f}")
+            section.append(f"  - Next 7 days forecast:")
+            for i, val in enumerate(forecast[:7], 1):
+                section.append(f"    Day {i}: {val:.2f} expected failures")
+        except Exception as e:
+            section.append(f"\nARIMA fitting error: {str(e)}")
 
     def generate_executive_summary(self):
         """Generate executive summary of all analyses."""
@@ -1040,7 +954,7 @@ class PredictiveMaintenanceAnalyzer:
         report = "\n".join(self.report_sections)
 
         if output_file:
-            with open(output_file, 'w', encoding='utf-8') as f:
+            with open(output_file, "w", encoding="utf-8") as f:
                 f.write(report)
             print(f"\n✓ Report saved to: {output_file}")
 
