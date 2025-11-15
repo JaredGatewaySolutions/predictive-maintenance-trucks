@@ -30,6 +30,3 @@ jupyterlab
 
 # Progress bars
 tqdm
-
-# REMOVED: statsmodels (ARIMA not needed for this use case)
-# REMOVED: flask, fastapi, uvicorn (API/UI not needed yet)
