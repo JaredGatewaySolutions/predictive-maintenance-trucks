@@ -6,7 +6,7 @@ Helper script to load and prepare SCANIA Component X dataset for analysis.
 
 Dataset available at: https://doi.org/10.5878/jvb5-d390
 
-NOTE: This script expects CSV files to be in the 'data/' subdirectory
+NOTE: This script expects CSV files to be in the 'data/raw' subdirectory
 """
 
 import pandas as pd
