@@ -3,33 +3,134 @@
 EXPLORATORY DATA ANALYSIS
 ================================================================================
 
-Dataset Shape: (1000, 22)
-Memory Usage: 0.17 MB
+Dataset Shape: (10000, 107)
+Memory Usage: 8.16 MB
 
 Data Types:
-  - float64: 20 columns
-  - int64: 2 columns
+  - float64: 106 columns
+  - int64: 1 columns
 
-✓ No missing values detected
+Missing Values:
+  - 427_0: 1.21%
+  - 167_0: 4.31%
+  - 167_1: 4.31%
+  - 167_2: 4.31%
+  - 167_3: 4.31%
+  - 167_4: 4.31%
+  - 167_5: 4.31%
+  - 167_6: 4.31%
+  - 167_7: 4.31%
+  - 167_8: 4.31%
+  - 167_9: 4.31%
+  - 272_0: 0.01%
+  - 272_1: 0.01%
+  - 272_2: 0.01%
+  - 272_3: 0.01%
+  - 272_4: 0.01%
+  - 272_5: 0.01%
+  - 272_6: 0.01%
+  - 272_7: 0.01%
+  - 272_8: 0.01%
+  - 272_9: 0.01%
+  - 370_0: 1.21%
+  - 291_0: 0.55%
+  - 291_1: 0.55%
+  - 291_2: 0.55%
+  - 291_3: 0.55%
+  - 291_4: 0.55%
+  - 291_5: 0.55%
+  - 291_6: 0.55%
+  - 291_7: 0.55%
+  - 291_8: 0.55%
+  - 291_9: 0.55%
+  - 291_10: 0.55%
+  - 158_0: 0.03%
+  - 158_1: 0.03%
+  - 158_2: 0.03%
+  - 158_3: 0.03%
+  - 158_4: 0.03%
+  - 158_5: 0.03%
+  - 158_6: 0.03%
+  - 158_7: 0.03%
+  - 158_8: 0.03%
+  - 158_9: 0.03%
+  - 100_0: 1.21%
+  - 459_0: 0.21%
+  - 459_1: 0.21%
+  - 459_2: 0.21%
+  - 459_3: 0.21%
+  - 459_4: 0.21%
+  - 459_5: 0.21%
+  - 459_6: 0.21%
+  - 459_7: 0.21%
+  - 459_8: 0.21%
+  - 459_9: 0.21%
+  - 459_10: 0.21%
+  - 459_11: 0.21%
+  - 459_12: 0.21%
+  - 459_13: 0.21%
+  - 459_14: 0.21%
+  - 459_15: 0.21%
+  - 459_16: 0.21%
+  - 459_17: 0.21%
+  - 459_18: 0.21%
+  - 459_19: 0.21%
+  - 397_0: 0.02%
+  - 397_1: 0.02%
+  - 397_2: 0.02%
+  - 397_3: 0.02%
+  - 397_4: 0.02%
+  - 397_5: 0.02%
+  - 397_6: 0.02%
+  - 397_7: 0.02%
+  - 397_8: 0.02%
+  - 397_9: 0.02%
+  - 397_10: 0.02%
+  - 397_11: 0.02%
+  - 397_12: 0.02%
+  - 397_13: 0.02%
+  - 397_14: 0.02%
+  - 397_15: 0.02%
+  - 397_16: 0.02%
+  - 397_17: 0.02%
+  - 397_18: 0.02%
+  - 397_19: 0.02%
+  - 397_20: 0.02%
+  - 397_21: 0.02%
+  - 397_22: 0.02%
+  - 397_23: 0.02%
+  - 397_24: 0.02%
+  - 397_25: 0.02%
+  - 397_26: 0.02%
+  - 397_27: 0.02%
+  - 397_28: 0.02%
+  - 397_29: 0.02%
+  - 397_30: 0.02%
+  - 397_31: 0.02%
+  - 397_32: 0.02%
+  - 397_33: 0.02%
+  - 397_34: 0.02%
+  - 397_35: 0.02%
 
 Numerical Features Summary:
-  - Numerical columns: 22
-  - Mean values range: [-0.08, 499.50]
-  - Std dev range: [0.50, 288.82]
+  - Numerical columns: 107
+  - Mean values range: [0.14, 157693738.80]
+  - Std dev range: [0.42, 154069949.14]
 
 ================================================================================
 FEATURE PREPARATION
 ================================================================================
+✗ Warning: No target column found, using synthetic target
 
 Feature Matrix:
-  - Total features: 21
-  - Samples: 1000
+  - Total features: 107
+  - Samples: 10000
   - Target variable: failure
 
 Target Distribution:
-  - Class 1: 508 (50.8%)
-  - Class 0: 492 (49.2%)
-  - Imbalance Ratio: 1.03:1
+  - Class 0: 5131 (51.3%)
+  - Class 1: 4869 (48.7%)
+  - Imbalance Ratio: 1.05:1
 
 ================================================================================
 CLASSIFICATION MODELS - FAILURE PREDICTION
@@ -45,9 +146,9 @@ Purpose: Simple, interpretable baseline model
 Strength: Fast, provides probability scores, interpretable coefficients
 
 Results:
-  - Training Accuracy: 0.8975
-  - Test Accuracy: 0.8800
-  - AUC-ROC: 0.9628
+  - Training Accuracy: 0.5386
+  - Test Accuracy: 0.4990
+  - AUC-ROC: 0.5027
 
 --------------------------------------------------------------------------------
 2. RANDOM FOREST
@@ -57,21 +158,21 @@ Strength: Handles non-linear relationships, robust to outliers
 Key for DoD: Provides feature importance for explainability
 
 Results:
-  - Training Accuracy: 1.0000
-  - Test Accuracy: 0.8650
-  - AUC-ROC: 0.9551
+  - Training Accuracy: 0.8261
+  - Test Accuracy: 0.5115
+  - AUC-ROC: 0.5188
 
 Top 10 Most Important Features:
-  sensor_0: 0.2833
-  sensor_1: 0.2626
-  sensor_2: 0.0287
-  environmental_0: 0.0268
-  sensor_7: 0.0263
-  sensor_3: 0.0261
-  sensor_5: 0.0256
-  environmental_4: 0.0255
-  vehicle_id: 0.0246
-  environmental_1: 0.0243
+  397_12: 0.0144
+  397_6: 0.0131
+  272_0: 0.0127
+  459_16: 0.0126
+  397_14: 0.0121
+  459_0: 0.0119
+  158_3: 0.0118
+  time_step: 0.0118
+  397_27: 0.0116
+  158_5: 0.0115
 
 --------------------------------------------------------------------------------
 3. GRADIENT BOOSTING
@@ -80,9 +181,9 @@ Purpose: Sequential ensemble, often best performance
 Strength: Handles complex patterns, state-of-art performance
 
 Results:
-  - Training Accuracy: 1.0000
-  - Test Accuracy: 0.8750
-  - AUC-ROC: 0.9406
+  - Training Accuracy: 0.7897
+  - Test Accuracy: 0.5160
+  - AUC-ROC: 0.5213
 
 --------------------------------------------------------------------------------
 4. XGBOOST
@@ -91,9 +192,9 @@ Purpose: Optimized gradient boosting, industry standard
 Strength: Fast, handles missing values, excellent performance
 
 Results:
-  - Training Accuracy: 1.0000
-  - Test Accuracy: 0.8800
-  - AUC-ROC: 0.9393
+  - Training Accuracy: 0.8377
+  - Test Accuracy: 0.5000
+  - AUC-ROC: 0.5137
 
 --------------------------------------------------------------------------------
 MODEL COMPARISON
@@ -108,12 +209,12 @@ Metrics Explained:
   • AUC-ROC: Overall model discrimination ability (0.5=random, 1.0=perfect)
 
               Model  Accuracy  Precision  Recall  F1-Score  AUC-ROC
-Logistic Regression     0.880   0.880000   0.880  0.880000 0.962785
-      Random Forest     0.865   0.865248   0.865  0.864929 0.955082
-  Gradient Boosting     0.875   0.875013   0.875  0.874984 0.940576
-            XGBoost     0.880   0.880514   0.880  0.879904 0.939276
+Logistic Regression    0.4990   0.497076  0.4990  0.495517 0.502715
+      Random Forest    0.5115   0.510558  0.5115  0.510231 0.518806
+  Gradient Boosting    0.5160   0.515065  0.5160  0.514664 0.521343
+            XGBoost    0.5000   0.499530  0.5000  0.499603 0.513732
 
-✓ Best Model: Logistic Regression (AUC-ROC: 0.9628)
+✓ Best Model: Gradient Boosting (AUC-ROC: 0.5213)
 
 ================================================================================
 REGRESSION MODELS - CONTINUOUS PREDICTION
@@ -131,9 +232,9 @@ Purpose: Simple baseline, assumes linear relationship
 Strength: Fast, interpretable, works well for linear relationships
 
 Results:
-  - R² Score: 0.9562
-  - MAE: 0.0780
-  - RMSE: 0.0970
+  - R² Score: 1.0000
+  - MAE: 0.0782
+  - RMSE: 0.0984
 
 --------------------------------------------------------------------------------
 2. RIDGE REGRESSION (L2 Regularization)
@@ -142,9 +243,9 @@ Purpose: Regularized regression, prevents overfitting
 Strength: Handles multicollinearity, shrinks coefficients
 
 Results:
-  - R² Score: 0.9562
-  - MAE: 0.0780
-  - RMSE: 0.0970
+  - R² Score: 1.0000
+  - MAE: 38189.7060
+  - RMSE: 59652.9423
 
 --------------------------------------------------------------------------------
 3. LASSO REGRESSION (L1 Regularization)
@@ -153,10 +254,10 @@ Purpose: Regularized regression with feature selection
 Strength: Automatically selects important features (sets others to 0)
 
 Results:
-  - R² Score: 0.7229
-  - MAE: 0.1979
-  - RMSE: 0.2440
-  - Non-zero features: 5/21
+  - R² Score: 0.9998
+  - MAE: 211323.3051
+  - RMSE: 320607.0763
+  - Non-zero features: 107/107
 
 --------------------------------------------------------------------------------
 4. GRADIENT BOOSTING REGRESSION
@@ -165,9 +266,9 @@ Purpose: Ensemble method for complex non-linear relationships
 Strength: High accuracy, handles complex patterns
 
 Results:
-  - R² Score: 0.8711
-  - MAE: 0.1328
-  - RMSE: 0.1664
+  - R² Score: 1.0000
+  - MAE: 48137.6790
+  - RMSE: 69624.0548
 
 --------------------------------------------------------------------------------
 MODEL COMPARISON
@@ -178,13 +279,13 @@ Metrics Explained:
   • MAE: Mean Absolute Error - average prediction error
   • RMSE: Root Mean Squared Error - penalizes large errors more
 
-            Model  R² Score      MAE     RMSE
-Linear Regression  0.956195 0.078016 0.097000
-            Ridge  0.956238 0.077976 0.096953
-            Lasso  0.722859 0.197929 0.243984
-Gradient Boosting  0.871087 0.132751 0.166402
+            Model  R² Score           MAE          RMSE
+Linear Regression  1.000000      0.078244      0.098388
+            Ridge  0.999995  38189.705984  59652.942267
+            Lasso  0.999847 211323.305134 320607.076308
+Gradient Boosting  0.999993  48137.678953  69624.054780
 
-✓ Best Model: Ridge (R²: 0.9562)
+✓ Best Model: Linear Regression (R²: 1.0000)
 
 ================================================================================
 SURVIVAL ANALYSIS - TIME-TO-FAILURE
@@ -231,8 +332,8 @@ Strength: Shows which variables increase/decrease failure risk
 
 Hazard Ratios (Risk Factors):
   (HR > 1: Increases failure risk, HR < 1: Decreases failure risk)
-  - usage_hours: HR=1.007 
-  - age: HR=1.067 
+  - usage_hours: HR=0.997 
+  - age: HR=1.000 
 
 Interpretation Example:
   If usage_hours has HR=1.05:
@@ -328,12 +429,12 @@ KEY CAPABILITIES DEMONSTRATED
 --------------------------------------------------------------------------------
 
 1. FAILURE PREDICTION (Classification)
-   ✓ Best Model: Logistic Regression
-   ✓ Performance: 96.3% accuracy (AUC-ROC)
+   ✓ Best Model: Gradient Boosting
+   ✓ Performance: 52.1% accuracy (AUC-ROC)
    ✓ Use Case: Predict which vehicles will fail in next 30 days
 
 2. MAINTENANCE FORECASTING (Regression)
-   ✓ R² Score: 95.6%
+   ✓ R² Score: 100.0%
    ✓ Use Case: Forecast maintenance hours/costs needed
 
 3. SURVIVAL ANALYSIS (Time-to-Failure)
