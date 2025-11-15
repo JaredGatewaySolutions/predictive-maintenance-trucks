@@ -19,6 +19,8 @@ import numpy as np
 import warnings
 from datetime import datetime
 import sys
+import time
+from tqdm import tqdm
 
 # Core ML libraries
 from sklearn.model_selection import train_test_split
@@ -101,11 +103,24 @@ class PredictiveMaintenanceAnalyzer:
         print(f"{'='*80}")
 
         try:
+            import os
+
+            file_size_mb = os.path.getsize(self.data_path) / (1024 * 1024)
+            print(f"File size: {file_size_mb:.1f} MB")
+
+            if file_size_mb > 100:
+                print("⏳ Large file detected - this may take several minutes...")
+                print("   Tip: Consider using a sample for faster testing:")
+                print(f"   pd.read_csv('{self.data_path}', nrows=10000)")
+
+            load_start = time.time()
             self.data = pd.read_csv(self.data_path)
-            print(f"✓ Data loaded successfully")
+            load_time = time.time() - load_start
+
+            print(f"✓ Data loaded successfully in {load_time:.1f}s")
             print(f"  - Shape: {self.data.shape}")
             print(f"  - Columns: {len(self.data.columns)}")
-            print(f"  - Rows: {len(self.data)}")
+            print(f"  - Rows: {len(self.data):,}")
             return True
         except Exception as e:
             print(f"✗ Error loading data: {e}")
@@ -253,6 +268,11 @@ class PredictiveMaintenanceAnalyzer:
 
         models = {}
 
+        # Progress tracking
+        model_count = 4 if XGBOOST_AVAILABLE else 3
+        print("\nTraining classification models...")
+        pbar = tqdm(total=model_count, desc="Models", unit="model")
+
         # 1. Logistic Regression (Simple, Interpretable Baseline)
         section.append("\n" + "-" * 80)
         section.append("1. LOGISTIC REGRESSION")
@@ -262,8 +282,10 @@ class PredictiveMaintenanceAnalyzer:
             "Strength: Fast, provides probability scores, interpretable coefficients"
         )
 
+        print("\n  Training Logistic Regression...")
         lr = LogisticRegression(max_iter=1000, random_state=42)
         lr.fit(X_train_scaled, y_train)
+        pbar.update(1)
         models["Logistic Regression"] = lr
 
         y_pred_lr = lr.predict(X_test_scaled)
@@ -286,10 +308,17 @@ class PredictiveMaintenanceAnalyzer:
         section.append("Strength: Handles non-linear relationships, robust to outliers")
         section.append("Key for DoD: Provides feature importance for explainability")
 
+        
+        print(
+            "\n  Training Random Forest (this may take a while for large datasets)..."
+        )
+
+        
         rf = RandomForestClassifier(
             n_estimators=100, max_depth=10, random_state=42, n_jobs=-1
         )
         rf.fit(X_train, y_train)
+        pbar.update(1)
         models["Random Forest"] = rf
 
         y_pred_rf = rf.predict(X_test)
@@ -316,8 +345,10 @@ class PredictiveMaintenanceAnalyzer:
         section.append("Purpose: Sequential ensemble, often best performance")
         section.append("Strength: Handles complex patterns, state-of-art performance")
 
+        print("\n  Training Gradient Boosting...")
         gb = GradientBoostingClassifier(n_estimators=100, max_depth=5, random_state=42)
         gb.fit(X_train, y_train)
+        pbar.update(1)
         models["Gradient Boosting"] = gb
 
         y_pred_gb = gb.predict(X_test)
@@ -338,6 +369,7 @@ class PredictiveMaintenanceAnalyzer:
                 "Strength: Fast, handles missing values, excellent performance"
             )
 
+            print("\n  Training XGBoost...")
             xgb_model = xgb.XGBClassifier(
                 n_estimators=100,
                 max_depth=5,
@@ -347,6 +379,7 @@ class PredictiveMaintenanceAnalyzer:
             )
             xgb_model.fit(X_train, y_train)
             models["XGBoost"] = xgb_model
+            pbar.update(1)
 
             y_pred_xgb = xgb_model.predict(X_test)
             y_proba_xgb = xgb_model.predict_proba(X_test)[:, 1]
@@ -357,6 +390,8 @@ class PredictiveMaintenanceAnalyzer:
             )
             section.append(f"  - Test Accuracy: {xgb_model.score(X_test, y_test):.4f}")
             section.append(f"  - AUC-ROC: {roc_auc_score(y_test, y_proba_xgb):.4f}")
+
+        pbar.close()
 
         # Model Comparison
         section.append("\n" + "-" * 80)
@@ -1005,9 +1040,9 @@ class PredictiveMaintenanceAnalyzer:
         report = "\n".join(self.report_sections)
 
         if output_file:
-            with open(output_file, "w", encoding="utf-8") as f:
+            with open(output_file, "w") as f:
                 f.write(report)
-            print(f"\n Report saved to: {output_file}")
+            print(f"\n✓ Report saved to: {output_file}")
 
         return report
 
@@ -1019,33 +1054,63 @@ class PredictiveMaintenanceAnalyzer:
             target_col: Name of target variable for classification
             time_col: Name of time column (if available)
         """
+        start_time = time.time()
+
         print("\n" + "=" * 80)
         print("PREDICTIVE MAINTENANCE ANALYTICS - FULL ANALYSIS")
         print("=" * 80)
         print(f"Start Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print(
+            f"Dataset Size: {self.data.shape[0]:,} rows × {self.data.shape[1]} columns"
+        )
 
         # 1. EDA
+        step_start = time.time()
+        print("\n[1/7] Exploratory Data Analysis...")
         self.exploratory_analysis()
+        print(f"  ⏱ Completed in {time.time() - step_start:.1f}s")
 
         # 2. Feature preparation
+        step_start = time.time()
+        print("\n[2/7] Feature Preparation...")
         self.prepare_features(target_col, time_col)
+        print(f"  ⏱ Completed in {time.time() - step_start:.1f}s")
 
         # 3. Classification models
+        step_start = time.time()
+        print("\n[3/7] Classification Models (this will take a while)...")
         self.run_classification_models()
+        print(f"  ⏱ Completed in {time.time() - step_start:.1f}s")
 
         # 4. Regression models
+        step_start = time.time()
+        print("\n[4/7] Regression Models...")
         self.run_regression_models()
+        print(f"  ⏱ Completed in {time.time() - step_start:.1f}s")
 
         # 5. Survival analysis
+        step_start = time.time()
+        print("\n[5/7] Survival Analysis...")
         self.run_survival_analysis()
+        print(f"  ⏱ Completed in {time.time() - step_start:.1f}s")
 
         # 6. Time series
+        step_start = time.time()
+        print("\n[6/7] Time Series Forecasting...")
         self.run_time_series_analysis()
+        print(f"  ⏱ Completed in {time.time() - step_start:.1f}s")
 
         # 7. Executive summary
+        step_start = time.time()
+        print("\n[7/7] Generating Executive Summary...")
         self.generate_executive_summary()
+        print(f"  ⏱ Completed in {time.time() - step_start:.1f}s")
 
-        print(f"\nEnd Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        elapsed_time = time.time() - start_time
+        mins, secs = divmod(elapsed_time, 60)
+        print(f"\n{'='*80}")
+        print(f"Total Runtime: {int(mins)}m {int(secs)}s")
+        print(f"End Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         print("=" * 80)
 
 

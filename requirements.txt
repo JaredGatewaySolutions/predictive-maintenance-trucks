@@ -25,3 +25,6 @@ jupyterlab
 flask
 fastapi
 uvicorn
+
+# Progress bars
+tqdm
