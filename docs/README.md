@@ -41,7 +41,6 @@ python predictive_maintenance_demo.py train_operational_readouts.csv
 This script demonstrates **4 major predictive analytics approaches**:
 
 ### 1. **Classification Models** 🎯
-
 **Question:** "Will this vehicle fail in the next 30 days?"
 
 - **Logistic Regression** - Simple, interpretable baseline
@@ -50,14 +49,12 @@ This script demonstrates **4 major predictive analytics approaches**:
 - **XGBoost** - Industry standard, optimized performance
 
 **Metrics:**
-
 - Precision: Of predicted failures, how many actually failed?
 - Recall: Of actual failures, how many did we predict?
 - F1-Score: Balance between precision and recall
 - AUC-ROC: Overall discrimination ability
 
 ### 2. **Regression Models** 📈
-
 **Question:** "How many maintenance hours will be needed next month?"
 
 - **Linear Regression** - Simple baseline
@@ -65,13 +62,11 @@ This script demonstrates **4 major predictive analytics approaches**:
 - **Gradient Boosting Regression** - Complex non-linear relationships
 
 **Metrics:**
-
 - R² Score: Proportion of variance explained
 - MAE: Mean Absolute Error
 - RMSE: Root Mean Squared Error
 
 ### 3. **Survival Analysis** ⏱️
-
 **Question:** "What's the probability this vehicle makes it through a 90-day deployment?"
 
 - **Kaplan-Meier** - Survival probability curves
@@ -79,13 +74,11 @@ This script demonstrates **4 major predictive analytics approaches**:
 - **Weibull Analysis** - Reliability engineering standard
 
 **Applications:**
-
 - Mission planning probability calculations
 - Maintenance scheduling optimization
 - Spare parts demand forecasting
 
 ### 4. **Time Series Forecasting** 📅
-
 **Question:** "Predict readiness rates for next quarter"
 
 - **ARIMA** - Classic time series forecasting
@@ -93,14 +86,13 @@ This script demonstrates **4 major predictive analytics approaches**:
 - **Trend & Seasonality Detection**
 
 **Applications:**
-
 - Budget planning
 - Readiness forecasting
 - Supply chain optimization
 
 ## 📁 File Structure
 
-```bash
+```
 predictive_maintenance_demo.py    # Main analysis script
 requirements.txt                   # Python dependencies
 predictive_maintenance_report.txt # Generated report (after running)
@@ -143,25 +135,21 @@ The script generates a comprehensive report with these sections:
 ## 💼 DoD/Military Value Proposition
 
 ### Increased Readiness
-
 ✓ Predict failures before they occur  
 ✓ Maximize vehicle availability  
 ✓ Data-driven maintenance scheduling
 
 ### Cost Savings
-
 ✓ Prevent catastrophic failures  
 ✓ Optimize parts inventory  
 ✓ Better budget forecasting
 
 ### Mission Success
-
 ✓ Calculate mission completion probability  
 ✓ Identify high-risk equipment  
 ✓ Scientific vs. arbitrary schedules
 
 ### Safety
-
 ✓ Prevent failures endangering personnel  
 ✓ Identify systemic fleet issues
 
@@ -178,7 +166,6 @@ vehicle_id,sensor_1,sensor_2,...,failure,timestamp
 ```
 
 **Key columns:**
-
 - **Numerical features** - Sensor readings, usage metrics, environmental data
 - **Target variable** - Binary (0/1) for failure prediction
 - **Timestamp** (optional) - For time series analysis
@@ -200,7 +187,7 @@ analyzer.run_full_analysis(target_col='failure', time_col='timestamp')
 
 The SCANIA Component X dataset is a perfect real-world example:
 
-1. Download from: <https://doi.org/10.5878/jvb5-d390>
+1. Download from: https://doi.org/10.5878/jvb5-d390
 2. Files to use:
    - `train_operational_readouts.csv` (1.1M+ readouts, 23,550 vehicles)
    - `train_tte.csv` (time-to-event data)
@@ -219,26 +206,22 @@ python predictive_maintenance_demo.py train_operational_readouts.csv
 ### Algorithms Implemented
 
 **Classification:**
-
 - Logistic Regression (sklearn)
 - Random Forest (sklearn)
 - Gradient Boosting (sklearn)
 - XGBoost (xgboost)
 
 **Regression:**
-
 - Linear Regression (sklearn)
 - Ridge/Lasso (sklearn)
 - Gradient Boosting Regressor (sklearn)
 
 **Survival Analysis:**
-
 - Kaplan-Meier Estimator (lifelines)
 - Cox Proportional Hazards (lifelines)
 - Weibull Fitter (lifelines)
 
 **Time Series:**
-
 - ARIMA (statsmodels)
 - Moving Average (custom)
 
@@ -287,13 +270,11 @@ def predict():
 ## 📚 Learning Resources
 
 **Understanding the Concepts:**
-
 - Classification vs Regression: [scikit-learn guide](https://scikit-learn.org)
 - Survival Analysis: [lifelines documentation](https://lifelines.readthedocs.io)
 - Time Series: [statsmodels guide](https://www.statsmodels.org)
 
 **DoD/Military Applications:**
-
 - Army Readiness: How predictive maintenance increases availability
 - Mission Planning: Probability calculations for deployments
 - Cost Optimization: ROI of predictive vs reactive maintenance
@@ -303,7 +284,6 @@ def predict():
 Want to add more capabilities?
 
 **Ideas:**
-
 - Deep Learning (LSTM for time series)
 - Anomaly Detection (Isolation Forest, Autoencoders)
 - Multi-target Prediction (failure type classification)
@@ -313,7 +293,6 @@ Want to add more capabilities?
 ## 📞 Support
 
 For DPRA interview preparation or questions:
-
 - Focus on explaining **why** each technique is used
 - Understand **trade-offs** (accuracy vs interpretability)
 - Know **business value** (cost savings, readiness, safety)
@@ -321,25 +300,21 @@ For DPRA interview preparation or questions:
 ## 🏆 Key Talking Points for Interview
 
 ### Technical Excellence
-
 ✓ "We implemented 4 complementary ML approaches"  
 ✓ "Demonstrated on 33,000 vehicle real-world dataset"  
 ✓ "Production-ready frameworks (scikit-learn, XGBoost)"
 
 ### Business Value
-
 ✓ "Increase readiness 15-30% through predictive maintenance"  
 ✓ "Reduce emergency repairs by 40% (industry benchmark)"  
 ✓ "Save $X per vehicle per year (calculate based on costs)"
 
 ### DoD Relevance
-
 ✓ "Mission planning: Calculate deployment success probability"  
 ✓ "Budget forecasting: Predict maintenance needs 6-12 months out"  
 ✓ "Safety: Prevent failures that endanger personnel"
 
 ### Scalability
-
 ✓ "Handles fleet of 10,000+ vehicles"  
 ✓ "Real-time inference < 100ms"  
 ✓ "Cloud-native architecture (AWS/Azure/GovCloud)"

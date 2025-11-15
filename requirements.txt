@@ -1,0 +1,27 @@
+# Predictive Maintenance Analytics Requirements
+# Core ML and Data Science Libraries
+
+# Data manipulation
+pandas
+numpy
+
+# Machine Learning
+scikit-learn
+xgboost
+
+# Time Series Analysis
+statsmodels
+
+# Survival Analysis
+lifelines
+
+# Optional but recommended
+matplotlib
+seaborn
+jupyter
+jupyterlab
+
+# For production deployment
+flask
+fastapi
+uvicorn
