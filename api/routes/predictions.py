@@ -27,8 +27,6 @@ import logging
 from core.feature_mapper import (
     convert_to_model_format,
     auto_detect_format,
-    SCANIA_TO_ABRAMS,
-    get_feature_info
 )
 
 # Configure logging

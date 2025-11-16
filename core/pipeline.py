@@ -526,9 +526,9 @@ class PredictionPipeline:
         Returns:
             Risk level string
         """
-        if probability >= 0.7:
+        if probability >= 0.07:
             return "HIGH"
-        elif probability >= 0.4:
+        elif probability >= 0.05:
             return "MEDIUM"
         else:
             return "LOW"
