@@ -4,6 +4,7 @@ export type FeatureEffect = 'INCREASES' | 'DECREASES';
 
 export interface ShapFactor {
   feature: string;
+  description?: string;
   value: number;
   shap_value: number;
   effect: FeatureEffect;

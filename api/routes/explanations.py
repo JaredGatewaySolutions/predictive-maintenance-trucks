@@ -13,6 +13,7 @@ from typing import List, Dict, Any, Optional
 import pandas as pd
 import json
 from pathlib import Path
+from core.feature_mapper import SCANIA_TO_ABRAMS, FEATURE_DESCRIPTIONS
 
 router = APIRouter(prefix="/api/v1", tags=["explanations"])
 
@@ -23,6 +24,7 @@ PREDICTIONS_DIR = Path("data/predictions")
 class ExplanationFactor(BaseModel):
     """Individual risk factor from SHAP analysis."""
     feature: str = Field(..., description="Feature name")
+    description: Optional[str] = Field(None, description="Human-readable feature description")
     value: float = Field(..., description="Feature value for this vehicle")
     shap_value: float = Field(..., description="SHAP value (contribution to prediction)")
     effect: str = Field(..., description="INCREASES or DECREASES risk")
@@ -47,19 +49,21 @@ class ExplanationResponse(BaseModel):
                 "risk_level": "HIGH",
                 "top_factors": [
                     {
-                        "feature": "aa_000",
-                        "value": 76294.0,
+                        "feature": "ENGINE_HOURS",
+                        "description": "Turbine operating time - Primary service life limiter per DoD specs",
+                        "value": 2450.0,
                         "shap_value": 0.123,
                         "effect": "INCREASES"
                     },
                     {
-                        "feature": "ab_000",
-                        "value": 0.0,
+                        "feature": "TEMP_MODERATE_MI",
+                        "description": "Miles operated in moderate temperature conditions",
+                        "value": 1200.0,
                         "shap_value": -0.045,
                         "effect": "DECREASES"
                     }
                 ],
-                "explanation_text": "Primary risk driver: aa_000 (contributes +0.123 to failure risk)",
+                "explanation_text": "Primary risk driver: ENGINE_HOURS (contributes +0.123 to failure risk)",
                 "timestamp": "2025-11-15T17:50:00.123456"
             }
         }
@@ -145,26 +149,35 @@ async def explain_prediction(vehicle_id: str, api_request: Request):
                 detail="Failed to generate explanation. SHAP analysis error."
             )
         
-        # Build response with top factors
+        # Build response with top factors - translate Scania codes to Abrams names
         top_factors = []
         for factor in explanation["top_factors"]:
+            # Get human-readable M1 Abrams feature name
+            scania_code = factor["feature"]
+            abrams_name = SCANIA_TO_ABRAMS.get(scania_code, scania_code)
+            feature_description = FEATURE_DESCRIPTIONS.get(abrams_name, None)
+            
             top_factors.append(ExplanationFactor(
-                feature=factor["feature"],
+                feature=abrams_name,
+                description=feature_description,
                 value=factor["value"],
                 shap_value=factor["shap_value"],
                 effect="INCREASES" if factor["shap_value"] > 0 else "DECREASES"
             ))
         
-        # Create human-readable explanation
+        # Create human-readable explanation with M1 Abrams feature names
         primary_factor = explanation["top_factors"][0]
+        primary_factor_code = primary_factor['feature']
+        primary_factor_name = SCANIA_TO_ABRAMS.get(primary_factor_code, primary_factor_code)
+        
         if primary_factor["shap_value"] > 0:
             explanation_text = (
-                f"Primary risk driver: {primary_factor['feature']} "
+                f"Primary risk driver: {primary_factor_name} "
                 f"(contributes +{primary_factor['shap_value']:.3f} to failure risk)"
             )
         else:
             explanation_text = (
-                f"Primary protective factor: {primary_factor['feature']} "
+                f"Primary protective factor: {primary_factor_name} "
                 f"(reduces failure risk by {abs(primary_factor['shap_value']):.3f})"
             )
         
