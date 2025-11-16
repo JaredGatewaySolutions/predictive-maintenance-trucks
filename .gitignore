@@ -240,3 +240,4 @@ frontend/*.log
 # API cache and logs
 api/__pycache__/
 *.log
+__pycache__
