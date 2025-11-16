@@ -1,5 +1,5 @@
 <mat-toolbar color="primary" class="app-toolbar">
-  <button mat-icon-button>
+  <button mat-icon-button (click)="toggleSidenav()">
     <mat-icon>menu</mat-icon>
   </button>
   <span class="toolbar-title">{{ title() }}</span>
@@ -12,19 +12,27 @@
   </button>
 </mat-toolbar>
 
-<div class="app-container">
-  <nav class="app-nav">
-    <a mat-button routerLink="/dashboard" routerLinkActive="active-link">
-      <mat-icon>dashboard</mat-icon>
-      Dashboard
-    </a>
-    <a mat-button routerLink="/upload" routerLinkActive="active-link">
-      <mat-icon>upload_file</mat-icon>
-      Batch Upload
-    </a>
-  </nav>
+<mat-sidenav-container class="app-container">
+  <mat-sidenav
+    #sidenav
+    [mode]="sidenavMode()"
+    [opened]="sidenavOpened()"
+    class="app-sidenav">
+    <nav class="app-nav">
+      <a mat-button routerLink="/dashboard" routerLinkActive="active-link" (click)="closeSidenavOnMobile()">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </a>
+      <a mat-button routerLink="/upload" routerLinkActive="active-link" (click)="closeSidenavOnMobile()">
+        <mat-icon>upload_file</mat-icon>
+        <span>Batch Upload</span>
+      </a>
+    </nav>
+  </mat-sidenav>
 
-  <main class="app-content">
-    <router-outlet />
-  </main>
-</div>
+  <mat-sidenav-content>
+    <main class="app-content">
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>
