@@ -9,7 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { Subscription } from 'rxjs';
 
@@ -48,7 +48,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   metrics = signal<ApiMetrics | null>(null);
   predictions = signal<Prediction[]>([]);
   riskSummary = signal<RiskSummary | null>(null);
-  topRiskVehicles = signal<Prediction[]>([]);
+  fleetVehicles = signal<Prediction[]>([]);
   costAnalysis = signal<CostAnalysis | null>(null);
 
   // Fleet/ABCT management
@@ -67,7 +67,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private apiService: ApiService,
     private analyticsService: AnalyticsService,
     private fleetStateService: FleetStateService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -173,7 +174,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     // Clear all prediction data when no fleets are available
     this.predictions.set([]);
     this.riskSummary.set(null);
-    this.topRiskVehicles.set([]);
+    this.fleetVehicles.set([]);
     this.costAnalysis.set(null);
     this.riskChartData.set([]);
     this.costChartData.set([]);
@@ -184,9 +185,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const summary = this.analyticsService.calculateRiskSummary(predictions);
     this.riskSummary.set(summary);
 
-    // Get top risk vehicles
-    const topRisk = this.analyticsService.getTopRiskVehicles(predictions, 10);
-    this.topRiskVehicles.set(topRisk);
+    // Sort all vehicles by risk: high first, then by probability
+    const sortedVehicles = [...predictions].sort((a, b) => {
+      const riskOrder = { 'High': 0, 'Medium': 1, 'Low': 2 };
+      const riskCompare = riskOrder[a.risk_level as keyof typeof riskOrder] - riskOrder[b.risk_level as keyof typeof riskOrder];
+      if (riskCompare !== 0) return riskCompare;
+      return b.probability - a.probability; // Higher probability first
+    });
+    this.fleetVehicles.set(sortedVehicles);
 
     // Calculate cost analysis
     const costs = this.analyticsService.calculateCostAnalysis(predictions);
@@ -226,5 +232,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   refresh(): void {
     this.loadDashboardData();
+  }
+
+  navigateToVehicle(vehicle: Prediction): void {
+    this.router.navigate(['/vehicle', vehicle.vehicle_id]);
   }
 }
