@@ -87,7 +87,7 @@ export class ApiService {
   }
 
   /**
-   * Create a new empty fleet
+   * Create a new fleet
    */
   createFleet(fleetName: string): Observable<Fleet> {
     return this.http.post<Fleet>(`${this.apiUrl}/api/v1/fleets`, null, {

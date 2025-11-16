@@ -101,11 +101,11 @@ export class AnalyticsService {
       case 'HIGH':
         return '#f44336'; // Red
       case 'MEDIUM':
-        return '#ff9800'; // Orange
+        return '#CC7722'; // Orange
       case 'LOW':
         return '#4caf50'; // Green
       default:
-        return '#9e9e9e'; // Gray
+        return '#B8B8B0'; // Gray
     }
   }
 

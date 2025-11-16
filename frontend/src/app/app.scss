@@ -1,14 +1,27 @@
+@use '../styles/variables' as vars;
+
 .app-toolbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
+  background: linear-gradient(135deg, vars.$army-green-dark 0%, vars.$army-green 100%) !important;
+  border-bottom: 3px solid vars.$tactical-gold;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .toolbar-title {
   font-size: 20px;
-  font-weight: 500;
+  font-weight: 600;
+  color: vars.$white;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+
+  mat-icon {
+    margin-right: 12px;
+    color: vars.$tactical-gold;
+  }
 }
 
 .toolbar-spacer {
@@ -16,7 +29,8 @@
 }
 
 .active-link {
-  color: #ffc107 !important;
+  color: vars.$tactical-gold !important;
+  font-weight: 600;
 }
 
 .app-container {
@@ -26,7 +40,8 @@
 
 .app-sidenav {
   width: 240px;
-  border-right: 1px solid #e0e0e0;
+  border-right: 2px solid vars.$field-grey-light;
+  background-color: vars.$white;
 }
 
 .app-nav {
@@ -38,16 +53,20 @@
   a {
     display: flex;
     align-items: center;
-    padding: 12px 16px;
+    padding: 14px 16px;
     text-decoration: none;
-    color: rgba(0, 0, 0, 0.87);
-    transition: background-color 0.2s;
+    color: vars.$combat-grey;
+    transition: all 0.2s ease;
     justify-content: flex-start;
     border-radius: 0;
     width: 100%;
+    font-weight: 500;
+    border-left: 4px solid transparent;
 
     mat-icon {
       margin-right: 12px;
+      color: vars.$field-grey;
+      transition: color 0.2s ease;
     }
 
     span {
@@ -55,20 +74,31 @@
     }
 
     &:hover {
-      background-color: rgba(0, 0, 0, 0.04);
+      background-color: vars.$canvas-tan;
+      border-left-color: vars.$desert-tan;
+
+      mat-icon {
+        color: vars.$army-green;
+      }
     }
 
     &.active-link {
-      background-color: rgba(63, 81, 181, 0.08);
-      color: #3f51b5;
-      border-right: 3px solid #3f51b5;
+      background: linear-gradient(90deg, rgba(vars.$army-green, 0.12) 0%, rgba(vars.$army-green, 0.04) 100%);
+      color: vars.$army-green;
+      border-right: 4px solid vars.$army-green;
+      border-left: 4px solid vars.$tactical-gold;
+      font-weight: 600;
+
+      mat-icon {
+        color: vars.$tactical-gold;
+      }
     }
   }
 }
 
 .app-content {
   padding: 24px;
-  background-color: #f5f5f5;
+  background-color: vars.$canvas-tan;
   min-height: 100%;
 }
 

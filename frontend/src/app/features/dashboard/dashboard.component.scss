@@ -1,3 +1,6 @@
+@use '../../../styles/variables' as vars;
+@use 'sass:color';
+
 .dashboard-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -8,11 +11,19 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+  padding: vars.$spacing-lg;
+  background: linear-gradient(135deg, vars.$army-green-dark 0%, vars.$army-green 100%);
+  border-radius: vars.$border-radius;
+  border-bottom: 3px solid vars.$tactical-gold;
+  box-shadow: vars.$shadow-md;
 
   h1 {
     margin: 0;
     font-size: 28px;
-    font-weight: 500;
+    font-weight: 600;
+    color: vars.$white;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
 
   .header-actions {
@@ -23,6 +34,60 @@
     .abct-selector {
       min-width: 350px;
       margin-right: 16px;
+
+      // Style the select to match army theme with proper contrast
+      ::ng-deep {
+        // Add background to the text field wrapper for proper contrast
+        .mat-mdc-text-field-wrapper {
+          background-color: rgba(255, 255, 255, 0.95);
+          border-radius: vars.$border-radius;
+        }
+
+        // Ensure the notched outline is visible
+        .mdc-notched-outline {
+          .mdc-notched-outline__leading,
+          .mdc-notched-outline__notch,
+          .mdc-notched-outline__trailing {
+            border-color: rgba(255, 255, 255, 0.7) !important;
+          }
+        }
+
+        // When focused, use a stronger border
+        &.mat-focused {
+          .mdc-notched-outline {
+            .mdc-notched-outline__leading,
+            .mdc-notched-outline__notch,
+            .mdc-notched-outline__trailing {
+              border-color: vars.$white !important;
+            }
+          }
+        }
+
+        // Label text color for better visibility
+        .mat-mdc-form-field-label {
+          color: vars.$combat-grey !important;
+        }
+
+        // Selected value text color
+        .mat-mdc-select-value {
+          color: vars.$combat-grey-dark !important;
+        }
+
+        // Dropdown arrow color
+        .mat-mdc-select-arrow {
+          color: vars.$combat-grey !important;
+        }
+      }
+    }
+
+    button {
+      background-color: vars.$desert-tan;
+      color: vars.$white;
+      font-weight: 600;
+
+      &:hover {
+        background-color: color.adjust(vars.$desert-tan, $lightness: -10%);
+      }
     }
   }
 }
@@ -36,18 +101,28 @@
   gap: 16px;
 
   p {
-    color: rgba(0, 0, 0, 0.6);
+    color: vars.$field-grey;
+    font-weight: 500;
+  }
+
+  mat-spinner {
+    ::ng-deep circle {
+      stroke: vars.$army-green;
+    }
   }
 }
 
 .error-card {
   margin-bottom: 24px;
+  background-color: vars.$risk-high-bg;
+  border-left: 4px solid vars.$risk-high;
 
   mat-card-content {
     display: flex;
     align-items: center;
     gap: 12px;
-    color: #f44336;
+    color: vars.$risk-high;
+    font-weight: 600;
   }
 }
 
@@ -105,20 +180,31 @@
   display: flex;
   flex-direction: column;
   padding: 16px;
-  background-color: #f5f5f5;
-  border-radius: 4px;
+  background-color: vars.$white;
+  border: 1px solid vars.$border-color;
+  border-left: 3px solid vars.$army-green;
+  border-radius: vars.$border-radius;
+  box-shadow: vars.$shadow-sm;
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: vars.$shadow-md;
+    border-left-color: vars.$tactical-gold;
+  }
 
   .metric-label {
     font-size: 12px;
-    color: rgba(0, 0, 0, 0.6);
+    color: vars.$field-grey;
     text-transform: uppercase;
     margin-bottom: 8px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
   }
 
   .metric-value {
     font-size: 24px;
-    font-weight: 500;
-    color: rgba(0, 0, 0, 0.87);
+    font-weight: 700;
+    color: vars.$army-green;
   }
 }
 
@@ -161,54 +247,54 @@
   }
 
   &.high-risk {
-    background-color: #ffebee;
-    border-left: 4px solid #f44336;
+    background-color: vars.$risk-high-bg;
+    border-left: 4px solid vars.$risk-high;
 
     mat-icon {
-      color: #f44336;
+      color: vars.$risk-high;
     }
 
     .risk-count {
-      color: #f44336;
+      color: vars.$risk-high;
     }
   }
 
   &.medium-risk {
-    background-color: #fff3e0;
-    border-left: 4px solid #ff9800;
+    background-color: vars.$risk-medium-bg;
+    border-left: 4px solid vars.$risk-medium;
 
     mat-icon {
-      color: #ff9800;
+      color: vars.$risk-medium;
     }
 
     .risk-count {
-      color: #ff9800;
+      color: vars.$risk-medium;
     }
   }
 
   &.low-risk {
-    background-color: #e8f5e9;
-    border-left: 4px solid #4caf50;
+    background-color: vars.$risk-low-bg;
+    border-left: 4px solid vars.$risk-low;
 
     mat-icon {
-      color: #4caf50;
+      color: vars.$risk-low;
     }
 
     .risk-count {
-      color: #4caf50;
+      color: vars.$risk-low;
     }
   }
 
   &.total {
-    background-color: #e3f2fd;
-    border-left: 4px solid #2196f3;
+    background-color: color.adjust(vars.$canvas-tan, $lightness: 2%);
+    border-left: 4px solid vars.$army-green;
 
     mat-icon {
-      color: #2196f3;
+      color: vars.$army-green;
     }
 
     .risk-count {
-      color: #2196f3;
+      color: vars.$army-green;
     }
   }
 }
@@ -279,12 +365,17 @@
   width: 100%;
 
   th {
-    background-color: #fafafa;
-    font-weight: 600;
+    background-color: vars.$canvas-tan;
+    font-weight: 700;
+    color: vars.$army-green;
+    border-bottom: 2px solid vars.$army-green;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 13px;
 
     // Style for sortable headers
     &.mat-sort-header-sorted {
-      color: #3f51b5;
+      color: vars.$tactical-gold;
     }
   }
 
@@ -294,31 +385,32 @@
 
   // Style for sort arrows
   ::ng-deep .mat-sort-header-arrow {
-    color: #3f51b5;
+    color: vars.$army-green;
   }
 
   &.clickable-table {
     .clickable-row {
       cursor: pointer;
-      transition: background-color 0.2s ease;
+      transition: all 0.2s ease;
 
       &:hover {
-        background-color: #f5f5f5;
+        background-color: color.adjust(vars.$canvas-tan, $lightness: 3%);
+        border-left: 3px solid vars.$army-green;
       }
 
       &:active {
-        background-color: #eeeeee;
+        background-color: vars.$canvas-tan;
       }
     }
 
     // Style the chevron icon
     mat-icon {
-      color: rgba(0, 0, 0, 0.54);
+      color: vars.$field-grey;
       transition: color 0.2s ease;
     }
 
     .clickable-row:hover mat-icon {
-      color: rgba(0, 0, 0, 0.87);
+      color: vars.$tactical-gold;
     }
   }
 }
@@ -328,22 +420,26 @@
   padding: 4px 12px;
   border-radius: 12px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 
   &.risk-high {
-    background-color: #ffebee;
-    color: #f44336;
+    background-color: vars.$risk-high-bg;
+    color: vars.$risk-high;
+    border: 1px solid vars.$risk-high;
   }
 
   &.risk-medium {
-    background-color: #fff3e0;
-    color: #ff9800;
+    background-color: vars.$risk-medium-bg;
+    color: vars.$risk-medium;
+    border: 1px solid vars.$risk-medium;
   }
 
   &.risk-low {
-    background-color: #e8f5e9;
-    color: #4caf50;
+    background-color: vars.$risk-low-bg;
+    color: vars.$risk-low;
+    border: 1px solid vars.$risk-low;
   }
 }
 

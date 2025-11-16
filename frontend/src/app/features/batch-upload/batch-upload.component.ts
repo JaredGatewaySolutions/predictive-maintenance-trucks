@@ -152,20 +152,11 @@ export class BatchUploadComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // User entered an ABCT name - create the fleet immediately
-        console.log('Creating new ABCT:', result);
-        this.apiService.createFleet(result).subscribe({
-          next: (fleet) => {
-            console.log('✅ ABCT created:', fleet);
-            // Add to state and select it
-            this.fleetStateService.addFleet(fleet);
-            this.abctName.set(result);
-          },
-          error: (err) => {
-            console.error('❌ Failed to create ABCT:', err);
-            this.error.set(`Failed to create ABCT: ${err.message}`);
-          }
-        });
+        // User entered an ABCT name - just set it, the fleet will be created when CSV is uploaded
+        console.log('Setting new ABCT name:', result);
+        this.abctName.set(result);
+        this.selectedFleet.set(null); // Clear selection since this is a new fleet
+        this.success.set(`ABCT name set to "${result}". Upload a CSV file to create the fleet.`);
       }
     });
   }

@@ -1,0 +1,167 @@
+// ============================================
+// ARMY-THEMED COLOR PALETTE
+// ============================================
+
+// Primary Army Colors
+$army-green-dark: #3C4A1F;    // Dark Olive - darker emphasis
+$army-green: #4A5D23;          // Army Green (OD Green) - primary brand
+$army-green-light: #8A9A5B;   // Sage Green - lighter highlights
+
+// Accent Colors
+$desert-tan: #C19A6B;          // Coyote Brown/Desert Tan - warm accent
+$tactical-gold: #B8860B;       // Tactical Gold - active states & highlights
+$canvas-tan: #F5F3ED;          // Light Canvas Tan - backgrounds
+
+// Combat Neutrals
+$combat-grey-dark: #2A2A28;    // Very dark grey for strong contrast
+$combat-grey: #4A4A48;         // Dark grey - primary text
+$field-grey: #7A7D75;          // Medium grey - secondary text
+$field-grey-light: #B8B8B0;    // Light grey - borders
+
+// Risk/Status Colors (Military-themed)
+$risk-high: #f44336;           // Burnt Red - high risk/danger
+$risk-high-bg: #F5E6E0;        // Light burnt red background
+$risk-medium: #CC7722;         // Tactical Amber/Orange - medium risk
+$risk-medium-bg: #FFF5E8;      // Light amber background
+$risk-low: #4caf50;            // Green - low risk/safe
+$risk-low-bg: #EEF2E6;         // Light green background
+
+// Supporting Colors
+$white: #FFFFFF;
+$black: #000000;
+$shadow-color: rgba(0, 0, 0, 0.15);
+
+// ============================================
+// MATERIAL DESIGN COLOR DEFINITIONS
+// ============================================
+// Custom palettes for Angular Material theme
+
+// Army Green Palette (Primary)
+$army-palette: (
+  50: #E8EBE1,
+  100: #C6CDB4,
+  200: #A0AC83,
+  300: #7A8A51,
+  400: #5E712C,
+  500: #4A5D23,  // Main army green
+  600: #3F4F1E,
+  700: #344118,
+  800: #2A3413,
+  900: #1C240B,
+  A100: #B8C49A,
+  A200: #8A9A5B,
+  A400: #5C6D2F,
+  A700: #4A5D23,
+  contrast: (
+    50: $black,
+    100: $black,
+    200: $black,
+    300: $white,
+    400: $white,
+    500: $white,
+    600: $white,
+    700: $white,
+    800: $white,
+    900: $white,
+    A100: $black,
+    A200: $black,
+    A400: $white,
+    A700: $white,
+  )
+);
+
+// Desert Tan Palette (Accent)
+$tan-palette: (
+  50: #F8F3ED,
+  100: #EDE0D2,
+  200: #E1CCB5,
+  300: #D5B797,
+  400: #CCA780,
+  500: #C19A6B,  // Main desert tan
+  600: #B08D5F,
+  700: #9C7B51,
+  800: #886A43,
+  900: #654F2D,
+  A100: #F5E8D8,
+  A200: #E1CCB5,
+  A400: #C19A6B,
+  A700: #B8860B,  // Tactical gold
+  contrast: (
+    50: $black,
+    100: $black,
+    200: $black,
+    300: $black,
+    400: $black,
+    500: $black,
+    600: $black,
+    700: $white,
+    800: $white,
+    900: $white,
+    A100: $black,
+    A200: $black,
+    A400: $black,
+    A700: $white,
+  )
+);
+
+// Risk Red Palette (Warn)
+$risk-palette: (
+  50: #F5E6E0,
+  100: #E6C0B3,
+  200: #D69680,
+  300: #C66C4D,
+  400: #B94D26,
+  500: #f44336,  // Main risk red
+  600: #7F2100,
+  700: #701C00,
+  800: #621700,
+  900: #4A0F00,
+  A100: #FF9B80,
+  A200: #FF6B4D,
+  A400: #FF3B1A,
+  A700: #FF2200,
+  contrast: (
+    50: $black,
+    100: $black,
+    200: $black,
+    300: $white,
+    400: $white,
+    500: $white,
+    600: $white,
+    700: $white,
+    800: $white,
+    900: $white,
+    A100: $black,
+    A200: $black,
+    A400: $white,
+    A700: $white,
+  )
+);
+
+// ============================================
+// SPACING & SIZING
+// ============================================
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+
+// ============================================
+// TYPOGRAPHY
+// ============================================
+$font-family-base: 'Roboto', 'Arial', sans-serif;
+$font-family-heading: 'Roboto', 'Arial', sans-serif;
+
+// ============================================
+// BORDERS & SHADOWS
+// ============================================
+$border-radius: 4px;
+$border-radius-lg: 8px;
+$border-color: $field-grey-light;
+$tactical-border: 3px solid $army-green;
+$tactical-border-tan: 3px solid $desert-tan;
+
+$shadow-sm: 0 2px 4px $shadow-color;
+$shadow-md: 0 4px 8px $shadow-color;
+$shadow-lg: 0 8px 16px $shadow-color;

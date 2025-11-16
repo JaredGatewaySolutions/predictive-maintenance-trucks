@@ -1,5 +1,7 @@
+@use '../../../styles/variables' as vars;
+
 .batch-upload-container {
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
 }
 
@@ -9,29 +11,33 @@
   h1 {
     margin: 0 0 8px 0;
     font-size: 28px;
-    font-weight: 500;
+    font-weight: 600;
+    color: vars.$army-green;
   }
 
   p {
     margin: 0;
-    color: rgba(0, 0, 0, 0.6);
+    color: vars.$field-grey;
   }
 }
 
 // ABCT Selection Card
 .abct-selection-card {
   margin-bottom: 24px;
+  border-left: 4px solid vars.$army-green;
 
   mat-card-title {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #1976d2;
+    color: vars.$army-green;
+    font-weight: 600;
 
     mat-icon {
       font-size: 24px;
       width: 24px;
       height: 24px;
+      color: vars.$tactical-gold;
     }
   }
 
@@ -57,18 +63,20 @@
     align-items: center;
     gap: 8px;
     padding: 12px;
-    background-color: #e3f2fd;
-    border-radius: 4px;
-    color: #1976d2;
+    background-color: vars.$risk-low-bg;
+    border-radius: vars.$border-radius;
+    border-left: 3px solid vars.$army-green;
+    color: vars.$army-green;
 
     mat-icon {
       font-size: 20px;
       width: 20px;
       height: 20px;
+      color: vars.$tactical-gold;
     }
 
     strong {
-      color: #0d47a1;
+      color: vars.$army-green-dark;
     }
   }
 }
@@ -77,22 +85,26 @@
   margin-bottom: 24px;
 }
 
-// Info card with required features
+// Info card with required features - Army themed
 .info-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, vars.$army-green-dark 0%, vars.$army-green 100%);
+  color: vars.$white;
   margin-bottom: 24px;
+  border-bottom: 3px solid vars.$tactical-gold;
+  box-shadow: vars.$shadow-md;
 
   mat-card-header {
     mat-card-title {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      color: white;
+      color: vars.$white;
       font-size: 1.3rem;
+      font-weight: 600;
 
       mat-icon {
         font-size: 1.5rem;
+        color: vars.$tactical-gold;
       }
     }
   }
@@ -101,9 +113,10 @@
     font-size: 1rem;
     line-height: 1.6;
     margin-bottom: 1.5rem;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(vars.$canvas-tan, 0.15);
     padding: 1rem;
-    border-radius: 8px;
+    border-radius: vars.$border-radius;
+    border-left: 3px solid vars.$tactical-gold;
   }
 
   .feature-categories {
@@ -114,9 +127,10 @@
   }
 
   .category-group {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(vars.$desert-tan, 0.2);
     padding: 1rem;
-    border-radius: 8px;
+    border-radius: vars.$border-radius;
+    border: 1px solid rgba(vars.$tactical-gold, 0.3);
     backdrop-filter: blur(10px);
 
     h4 {
@@ -125,7 +139,9 @@
       gap: 0.5rem;
       margin: 0 0 0.75rem 0;
       font-size: 1rem;
-      font-weight: 600;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
 
       mat-icon {
         font-size: 1.2rem;
@@ -133,20 +149,20 @@
         height: 1.2rem;
 
         &.priority-highest {
-          color: #ffd700;
+          color: vars.$tactical-gold;
         }
         &.priority-high {
-          color: #ffa500;
+          color: vars.$risk-medium;
         }
         &.priority-medium {
-          color: #87ceeb;
+          color: vars.$canvas-tan;
         }
       }
 
       .feature-count {
         margin-left: auto;
         font-size: 0.85rem;
-        opacity: 0.8;
+        opacity: 0.9;
         font-weight: normal;
       }
     }
@@ -158,53 +174,64 @@
     }
 
     .feature-chip {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(vars.$canvas-tan, 0.3);
       padding: 0.35rem 0.75rem;
       border-radius: 16px;
       font-size: 0.75rem;
-      font-weight: 500;
+      font-weight: 600;
       cursor: help;
       transition: all 0.2s;
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(vars.$tactical-gold, 0.4);
 
       &:hover {
-        background: rgba(255, 255, 255, 0.3);
+        background: rgba(vars.$tactical-gold, 0.4);
         transform: translateY(-2px);
+        box-shadow: vars.$shadow-sm;
       }
     }
   }
 
   .download-template {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(vars.$desert-tan, 0.25);
     padding: 1rem;
-    border-radius: 8px;
+    border-radius: vars.$border-radius;
     text-align: center;
+    border: 1px solid vars.$tactical-gold;
 
     p {
       margin: 0 0 0.75rem 0;
       font-size: 1rem;
+      font-weight: 500;
     }
 
     .template-link {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      background: rgba(255, 255, 255, 0.9);
-      color: #667eea;
+      background: vars.$white;
+      color: vars.$army-green;
       padding: 0.75rem 1.5rem;
-      border-radius: 8px;
+      border-radius: vars.$border-radius;
       text-decoration: none;
-      font-weight: 600;
+      font-weight: 700;
       transition: all 0.2s;
+      border: 2px solid vars.$army-green;
 
       mat-icon {
         font-size: 1.2rem;
+        color: vars.$tactical-gold;
       }
 
       &:hover {
-        background: white;
+        background: vars.$tactical-gold;
+        color: vars.$white;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        box-shadow: vars.$shadow-md;
+        border-color: vars.$tactical-gold;
+
+        mat-icon {
+          color: vars.$white;
+        }
       }
     }
 
@@ -212,7 +239,7 @@
       display: block;
       margin-top: 0.5rem;
       font-size: 0.85rem;
-      opacity: 0.9;
+      opacity: 0.95;
     }
   }
 }
@@ -222,27 +249,29 @@
   flex-direction: column;
   align-items: center;
   padding: 48px;
-  border: 2px dashed #e0e0e0;
-  border-radius: 8px;
-  background-color: #fafafa;
+  border: 3px dashed vars.$field-grey-light;
+  border-radius: vars.$border-radius;
+  background-color: vars.$canvas-tan;
   transition: all 0.3s ease;
 
   &:hover {
-    border-color: #3f51b5;
-    background-color: #f5f7fa;
+    border-color: vars.$army-green;
+    background-color: rgba(vars.$army-green, 0.05);
+    border-style: solid;
   }
 
   .upload-icon {
     font-size: 72px;
     width: 72px;
     height: 72px;
-    color: #3f51b5;
+    color: vars.$army-green;
     margin-bottom: 16px;
   }
 
   p {
     margin: 16px 0;
-    color: rgba(0, 0, 0, 0.6);
+    color: vars.$field-grey;
+    font-weight: 500;
   }
 
   .file-name {
@@ -250,8 +279,8 @@
     align-items: center;
     gap: 8px;
     font-size: 18px;
-    font-weight: 500;
-    color: rgba(0, 0, 0, 0.87);
+    font-weight: 600;
+    color: vars.$army-green;
   }
 
   .upload-actions {
@@ -273,7 +302,14 @@
 
   p {
     margin-top: 16px;
-    color: rgba(0, 0, 0, 0.6);
+    color: vars.$field-grey;
+    font-weight: 500;
+  }
+
+  mat-progress-spinner {
+    ::ng-deep circle {
+      stroke: vars.$army-green !important;
+    }
   }
 }
 
@@ -283,19 +319,19 @@
   gap: 12px;
   padding: 16px;
   margin-top: 24px;
-  border-radius: 4px;
-  font-weight: 500;
+  border-radius: vars.$border-radius;
+  font-weight: 600;
 
   &.error-message {
-    background-color: #ffebee;
-    color: #f44336;
-    border-left: 4px solid #f44336;
+    background-color: vars.$risk-high-bg;
+    color: vars.$risk-high;
+    border-left: 4px solid vars.$risk-high;
   }
 
   &.success-message {
-    background-color: #e8f5e9;
-    color: #4caf50;
-    border-left: 4px solid #4caf50;
+    background-color: vars.$risk-low-bg;
+    color: vars.$risk-low;
+    border-left: 4px solid vars.$risk-low;
   }
 }
 
@@ -320,43 +356,47 @@
   display: flex;
   flex-direction: column;
   padding: 20px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  border-left: 4px solid #2196f3;
+  background-color: vars.$white;
+  border-radius: vars.$border-radius;
+  border-left: 4px solid vars.$army-green;
+  box-shadow: vars.$shadow-sm;
 
   .summary-label {
     font-size: 14px;
-    color: rgba(0, 0, 0, 0.6);
+    color: vars.$field-grey;
     margin-bottom: 8px;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.5px;
   }
 
   .summary-value {
     font-size: 32px;
-    font-weight: 600;
-    color: rgba(0, 0, 0, 0.87);
+    font-weight: 700;
+    color: vars.$army-green;
   }
 
   &.high-risk {
-    border-left-color: #f44336;
+    border-left-color: vars.$risk-high;
 
     .summary-value {
-      color: #f44336;
+      color: vars.$risk-high;
     }
   }
 
   &.medium-risk {
-    border-left-color: #ff9800;
+    border-left-color: vars.$risk-medium;
 
     .summary-value {
-      color: #ff9800;
+      color: vars.$risk-medium;
     }
   }
 
   &.low-risk {
-    border-left-color: #4caf50;
+    border-left-color: vars.$risk-low;
 
     .summary-value {
-      color: #4caf50;
+      color: vars.$risk-low;
     }
   }
 }
@@ -369,8 +409,11 @@
   width: 100%;
 
   th {
-    background-color: #fafafa;
-    font-weight: 600;
+    background-color: vars.$canvas-tan;
+    font-weight: 700;
+    color: vars.$army-green;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
   td, th {
@@ -383,22 +426,26 @@
   padding: 4px 12px;
   border-radius: 12px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 
   &.risk-high {
-    background-color: #ffebee;
-    color: #f44336;
+    background-color: vars.$risk-high-bg;
+    color: vars.$risk-high;
+    border: 1px solid vars.$risk-high;
   }
 
   &.risk-medium {
-    background-color: #fff3e0;
-    color: #ff9800;
+    background-color: vars.$risk-medium-bg;
+    color: vars.$risk-medium;
+    border: 1px solid vars.$risk-medium;
   }
 
   &.risk-low {
-    background-color: #e8f5e9;
-    color: #4caf50;
+    background-color: vars.$risk-low-bg;
+    color: vars.$risk-low;
+    border: 1px solid vars.$risk-low;
   }
 }
 

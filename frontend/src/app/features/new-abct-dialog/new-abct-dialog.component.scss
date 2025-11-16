@@ -1,3 +1,6 @@
+@use '../../../styles/variables' as vars;
+@use 'sass:color';
+
 .dialog-container {
   min-width: 400px;
   max-width: 500px;
@@ -7,7 +10,7 @@
     align-items: center;
     gap: 12px;
     margin: 0;
-    color: #1976d2;
+    color: vars.$army-green-dark;
 
     mat-icon {
       font-size: 28px;

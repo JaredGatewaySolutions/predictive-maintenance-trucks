@@ -3,7 +3,7 @@
     <h1>ABCT Dashboard</h1>
     <div class="header-actions">
       @if (fleets().length > 0) {
-        <mat-form-field appearance="outline" class="abct-selector">
+        <mat-form-field appearance="fill" class="abct-selector">
           <mat-label>Select ABCT</mat-label>
           <mat-select [(value)]="selectedFleet" (selectionChange)="selectFleet($event.value)">
             @for (fleet of fleets(); track fleet.fleet_id) {
@@ -171,7 +171,7 @@
         <mat-card-title>Fleet Vehicles</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <mat-form-field appearance="outline" class="filter-field">
+        <mat-form-field appearance="fill" class="filter-field">
           <mat-label>Filter Vehicles</mat-label>
           <input matInput (keyup)="applyFilter($event)" placeholder="Search by vehicle ID, risk level, etc." #input>
           <mat-icon matPrefix>search</mat-icon>

@@ -1,0 +1,288 @@
+// ============================================
+// ARMY-THEMED UTILITY CLASSES
+// ============================================
+
+@use './variables' as vars;
+@use 'sass:color';
+
+// ============================================
+// COLOR UTILITIES
+// ============================================
+
+// Text colors
+.army-text-primary { color: vars.$army-green !important; }
+.army-text-accent { color: vars.$desert-tan !important; }
+.army-text-gold { color: vars.$tactical-gold !important; }
+.army-text-dark { color: vars.$combat-grey !important; }
+.army-text-muted { color: vars.$field-grey !important; }
+
+// Background colors
+.army-bg-primary { background-color: vars.$army-green !important; }
+.army-bg-accent { background-color: vars.$desert-tan !important; }
+.army-bg-canvas { background-color: vars.$canvas-tan !important; }
+.army-bg-light { background-color: color.adjust(vars.$canvas-tan, $lightness: 3%) !important; }
+
+// ============================================
+// RISK/STATUS UTILITIES
+// ============================================
+
+// Risk level text colors
+.risk-high {
+  color: vars.$risk-high !important;
+  font-weight: 600;
+}
+
+.risk-medium {
+  color: vars.$risk-medium !important;
+  font-weight: 600;
+}
+
+.risk-low {
+  color: vars.$risk-low !important;
+  font-weight: 600;
+}
+
+// Risk level background colors with tactical borders
+.risk-high-bg {
+  background-color: vars.$risk-high-bg !important;
+  border-left: 4px solid vars.$risk-high !important;
+}
+
+.risk-medium-bg {
+  background-color: vars.$risk-medium-bg !important;
+  border-left: 4px solid vars.$risk-medium !important;
+}
+
+.risk-low-bg {
+  background-color: vars.$risk-low-bg !important;
+  border-left: 4px solid vars.$risk-low !important;
+}
+
+// Risk badges with military styling
+.risk-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &.risk-high {
+    background-color: vars.$risk-high-bg;
+    color: vars.$risk-high;
+    border: 1px solid vars.$risk-high;
+  }
+
+  &.risk-medium {
+    background-color: vars.$risk-medium-bg;
+    color: vars.$risk-medium;
+    border: 1px solid vars.$risk-medium;
+  }
+
+  &.risk-low {
+    background-color: vars.$risk-low-bg;
+    color: vars.$risk-low;
+    border: 1px solid vars.$risk-low;
+  }
+}
+
+// ============================================
+// TACTICAL COMPONENT UTILITIES
+// ============================================
+
+// Tactical card - military-style card with border
+.tactical-card {
+  background-color: vars.$white;
+  border: 1px solid vars.$border-color;
+  border-top: 3px solid vars.$army-green;
+  border-radius: vars.$border-radius;
+  box-shadow: vars.$shadow-sm;
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: vars.$shadow-md;
+    border-top-color: vars.$tactical-gold;
+  }
+}
+
+// Field section - canvas-styled section
+.field-section {
+  background-color: vars.$canvas-tan;
+  border: 1px solid vars.$field-grey-light;
+  border-radius: vars.$border-radius;
+  padding: vars.$spacing-lg;
+}
+
+// Combat border - strong border emphasis
+.combat-border {
+  border: 2px solid vars.$combat-grey;
+  border-radius: vars.$border-radius;
+}
+
+.combat-border-left {
+  border-left: 4px solid vars.$army-green;
+}
+
+.combat-border-top {
+  border-top: 3px solid vars.$army-green;
+}
+
+// ============================================
+// LAYOUT UTILITIES
+// ============================================
+
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+// Margins
+.mt-1 { margin-top: vars.$spacing-sm !important; }
+.mt-2 { margin-top: vars.$spacing-md !important; }
+.mt-3 { margin-top: vars.$spacing-lg !important; }
+.mt-4 { margin-top: vars.$spacing-xl !important; }
+
+.mb-1 { margin-bottom: vars.$spacing-sm !important; }
+.mb-2 { margin-bottom: vars.$spacing-md !important; }
+.mb-3 { margin-bottom: vars.$spacing-lg !important; }
+.mb-4 { margin-bottom: vars.$spacing-xl !important; }
+
+.ml-1 { margin-left: vars.$spacing-sm !important; }
+.ml-2 { margin-left: vars.$spacing-md !important; }
+.ml-3 { margin-left: vars.$spacing-lg !important; }
+
+.mr-1 { margin-right: vars.$spacing-sm !important; }
+.mr-2 { margin-right: vars.$spacing-md !important; }
+.mr-3 { margin-right: vars.$spacing-lg !important; }
+
+// Padding
+.p-1 { padding: vars.$spacing-sm !important; }
+.p-2 { padding: vars.$spacing-md !important; }
+.p-3 { padding: vars.$spacing-lg !important; }
+.p-4 { padding: vars.$spacing-xl !important; }
+
+.px-1 { padding-left: vars.$spacing-sm !important; padding-right: vars.$spacing-sm !important; }
+.px-2 { padding-left: vars.$spacing-md !important; padding-right: vars.$spacing-md !important; }
+.px-3 { padding-left: vars.$spacing-lg !important; padding-right: vars.$spacing-lg !important; }
+
+.py-1 { padding-top: vars.$spacing-sm !important; padding-bottom: vars.$spacing-sm !important; }
+.py-2 { padding-top: vars.$spacing-md !important; padding-bottom: vars.$spacing-md !important; }
+.py-3 { padding-top: vars.$spacing-lg !important; padding-bottom: vars.$spacing-lg !important; }
+
+// Flexbox
+.flex { display: flex; }
+.flex-column { display: flex; flex-direction: column; }
+.flex-row { display: flex; flex-direction: row; }
+.flex-wrap { flex-wrap: wrap; }
+
+.justify-start { justify-content: flex-start; }
+.justify-center { justify-content: center; }
+.justify-end { justify-content: flex-end; }
+.justify-between { justify-content: space-between; }
+.justify-around { justify-content: space-around; }
+
+.align-start { align-items: flex-start; }
+.align-center { align-items: center; }
+.align-end { align-items: flex-end; }
+.align-stretch { align-items: stretch; }
+
+// Gaps
+.gap-1 { gap: vars.$spacing-sm; }
+.gap-2 { gap: vars.$spacing-md; }
+.gap-3 { gap: vars.$spacing-lg; }
+.gap-4 { gap: vars.$spacing-xl; }
+
+// Width utilities
+.full-width { width: 100%; }
+.half-width { width: 50%; }
+
+// ============================================
+// TYPOGRAPHY UTILITIES
+// ============================================
+
+.font-weight-normal { font-weight: 400; }
+.font-weight-medium { font-weight: 500; }
+.font-weight-bold { font-weight: 700; }
+
+.text-uppercase { text-transform: uppercase; }
+.text-lowercase { text-transform: lowercase; }
+.text-capitalize { text-transform: capitalize; }
+
+.letter-spacing-sm { letter-spacing: 0.5px; }
+.letter-spacing-md { letter-spacing: 1px; }
+
+// ============================================
+// SHADOW UTILITIES
+// ============================================
+
+.shadow-sm { box-shadow: vars.$shadow-sm; }
+.shadow-md { box-shadow: vars.$shadow-md; }
+.shadow-lg { box-shadow: vars.$shadow-lg; }
+.shadow-none { box-shadow: none; }
+
+// ============================================
+// SPECIAL ARMY-THEMED UTILITIES
+// ============================================
+
+// Military header style
+.army-header {
+  background: linear-gradient(135deg, vars.$army-green-dark 0%, vars.$army-green 100%);
+  color: vars.$white;
+  padding: vars.$spacing-lg;
+  border-bottom: 3px solid vars.$tactical-gold;
+  box-shadow: vars.$shadow-md;
+}
+
+// Tactical button style
+.tactical-button {
+  background-color: vars.$army-green !important;
+  color: vars.$white !important;
+  border: 2px solid vars.$army-green-dark !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+
+  &:hover {
+    background-color: vars.$army-green-dark !important;
+    border-color: vars.$tactical-gold !important;
+  }
+}
+
+// Desert accent button
+.desert-button {
+  background-color: vars.$desert-tan !important;
+  color: vars.$white !important;
+  border: 2px solid color.adjust(vars.$desert-tan, $lightness: -10%) !important;
+  font-weight: 600 !important;
+
+  &:hover {
+    background-color: color.adjust(vars.$desert-tan, $lightness: -10%) !important;
+    border-color: vars.$tactical-gold !important;
+  }
+}
+
+// Status indicator dot
+.status-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: vars.$spacing-sm;
+
+  &.status-high { background-color: vars.$risk-high; }
+  &.status-medium { background-color: vars.$risk-medium; }
+  &.status-low { background-color: vars.$risk-low; }
+  &.status-active { background-color: vars.$army-green; }
+}
+
+// Camo-inspired divider
+.army-divider {
+  height: 2px;
+  background: linear-gradient(90deg,
+    vars.$army-green 0%,
+    vars.$desert-tan 50%,
+    vars.$army-green 100%
+  );
+  margin: vars.$spacing-lg 0;
+  border: none;
+}
