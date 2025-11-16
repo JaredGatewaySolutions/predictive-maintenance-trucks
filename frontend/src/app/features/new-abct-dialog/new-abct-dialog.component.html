@@ -1,0 +1,43 @@
+<div class="dialog-container">
+  <h2 mat-dialog-title>
+    <mat-icon>add</mat-icon>
+    Create New ABCT
+  </h2>
+
+  <mat-dialog-content>
+    <p class="dialog-description">
+      Enter a unique name for this Army Brigade Combat Team (ABCT). This will help you identify and manage your fleet data.
+    </p>
+
+    <form [formGroup]="abctForm" (ngSubmit)="onSubmit()">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>ABCT Name</mat-label>
+        <input
+          matInput
+          formControlName="abctName"
+          placeholder="e.g., 1st ABCT, Alpha Company, etc."
+          autofocus
+          required>
+        <mat-icon matPrefix>military_tech</mat-icon>
+        @if (abctForm.get('abctName')?.invalid && abctForm.get('abctName')?.touched) {
+          <mat-error>{{ getErrorMessage() }}</mat-error>
+        }
+        <mat-hint>Enter a memorable name for this ABCT</mat-hint>
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" type="button">
+      Cancel
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onSubmit()"
+      [disabled]="!abctForm.valid">
+      <mat-icon>check</mat-icon>
+      Create ABCT
+    </button>
+  </mat-dialog-actions>
+</div>

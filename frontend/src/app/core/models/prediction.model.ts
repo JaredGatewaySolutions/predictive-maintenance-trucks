@@ -61,10 +61,10 @@ export interface FleetPredictionsResponse {
 }
 
 // ============================================================================
-// OPTIMAL 20 FEATURES - M1 Abrams Tank Sensor Names
+// OPTIMAL 20 FEATURES - M1 Abrams Tank Metrics
 // ============================================================================
-// Selected via XGBoost Feature Importance Analysis (Nov 15, 2025)
-// These 20 features capture 28.6% of total importance and achieve 92.3% recall
+// Based on Army XEM Predictive Maintenance Requirements
+// Organized by impact tier on tank availability
 
 export interface FeatureMetadata {
   code: string;
@@ -77,216 +77,207 @@ export interface FeatureMetadata {
 }
 
 export const OPTIMAL_FEATURES: FeatureMetadata[] = [
-  // System Diagnostics & Performance (Highest Priority)
+  // TIER 1: Critical Service Life Limiters (Highest Priority)
   {
-    code: 'POWER_SYSTEM_METRIC_9',
-    displayName: 'Power System Metric 9',
-    description: 'Power system performance indicator #9 (Most predictive)',
-    category: 'System Diagnostics & Performance',
-    importance: 3.41,
+    code: 'TRACK_MILES',
+    displayName: 'Track Mileage',
+    description: 'Cumulative miles on track system - Primary availability driver (6,000 mile rebuild threshold)',
+    category: 'Critical Service Life Limiters',
+    importance: 5.2,
     rank: 1,
     priority: 'highest'
   },
   {
-    code: 'POWER_SYSTEM_METRIC_5',
-    displayName: 'Power System Metric 5',
-    description: 'Power system efficiency metric #5',
-    category: 'System Diagnostics & Performance',
-    importance: 1.71,
-    rank: 4,
-    priority: 'highest'
-  },
-  {
-    code: 'POWER_SYSTEM_METRIC_6',
-    displayName: 'Power System Metric 6',
-    description: 'Power distribution and stability metric #6',
-    category: 'System Diagnostics & Performance',
-    importance: 1.17,
-    rank: 18,
-    priority: 'highest'
-  },
-
-  // Temperature & Environmental Operations
-  {
-    code: 'TEMP_MODERATE_OPERATIONS',
-    displayName: 'Moderate Temp Operations',
-    description: 'Operational time in moderate temperature conditions',
-    category: 'Temperature & Environmental',
-    importance: 1.88,
+    code: 'ENGINE_HOURS',
+    displayName: 'Engine Operating Hours',
+    description: 'Total turbine engine hours - Drives major overhaul scheduling',
+    category: 'Critical Service Life Limiters',
+    importance: 4.8,
     rank: 2,
-    priority: 'high'
+    priority: 'highest'
   },
   {
-    code: 'TEMP_COLD_OPERATIONS',
-    displayName: 'Cold Weather Operations',
-    description: 'Operational time in cold weather environments',
-    category: 'Temperature & Environmental',
-    importance: 1.77,
+    code: 'MAIN_GUN_ROUNDS',
+    displayName: 'Main Gun Round Count',
+    description: 'Equivalent Full Charges (EFCs) fired - Gun tube replacement indicator',
+    category: 'Critical Service Life Limiters',
+    importance: 4.3,
     rank: 3,
-    priority: 'high'
-  },
-  {
-    code: 'TEMP_LOW_OPERATIONS',
-    displayName: 'Low Temperature Operations',
-    description: 'Performance in low-temperature operations',
-    category: 'Temperature & Environmental',
-    importance: 1.26,
-    rank: 9,
-    priority: 'high'
+    priority: 'highest'
   },
 
-  // Terrain & Mobility
+  // TIER 2: High-Failure Subsystems (High Priority)
   {
-    code: 'TERRAIN_TYPE_4',
-    displayName: 'Terrain Type 4',
-    description: 'Operations on terrain classification #4',
-    category: 'Terrain & Mobility',
-    importance: 1.48,
+    code: 'FIRE_CONTROL_SYSTEM_FAULTS',
+    displayName: 'Fire Control Faults',
+    description: 'Fire control system fault count - High failure rate even in new systems',
+    category: 'High-Failure Subsystems',
+    importance: 3.9,
+    rank: 4,
+    priority: 'high'
+  },
+  {
+    code: 'ELECTRICAL_SYSTEM_FAULTS',
+    displayName: 'Electrical System Faults',
+    description: 'Electrical subsystem failures - Both age-related and initial defects',
+    category: 'High-Failure Subsystems',
+    importance: 3.7,
     rank: 5,
-    priority: 'medium'
+    priority: 'high'
   },
   {
-    code: 'TERRAIN_TYPE_1',
-    displayName: 'Terrain Type 1',
-    description: 'Primary terrain type operational metric',
-    category: 'Terrain & Mobility',
-    importance: 1.22,
-    rank: 13,
-    priority: 'medium'
+    code: 'POWERTRAIN_FAILURES',
+    displayName: 'Powertrain Failure Count',
+    description: 'Transmission and final drive failures - Mission-critical mobility system',
+    category: 'High-Failure Subsystems',
+    importance: 3.5,
+    rank: 6,
+    priority: 'high'
   },
   {
-    code: 'TERRAIN_TYPE_5',
-    displayName: 'Terrain Type 5',
-    description: 'Terrain variation and mobility metric #5',
-    category: 'Terrain & Mobility',
-    importance: 1.21,
-    rank: 15,
-    priority: 'medium'
+    code: 'HYDRAULIC_SYSTEM_FAILURES',
+    displayName: 'Hydraulic System Failures',
+    description: 'Turret traverse, gun recoil, and brake hydraulic failures',
+    category: 'High-Failure Subsystems',
+    importance: 3.3,
+    rank: 7,
+    priority: 'high'
   },
 
-  // Operational Stress & Usage Patterns
+  // TIER 3: Age & Wear Components (Medium-High Priority)
   {
-    code: 'OPERATIONAL_STRESS_3',
-    displayName: 'Operational Stress 3',
-    description: 'Operational stress level indicator #3',
-    category: 'Operational Stress & Usage',
-    importance: 1.34,
-    rank: 6,
-    priority: 'medium'
-  },
-  {
-    code: 'OPERATIONAL_STRESS_15',
-    displayName: 'Operational Stress 15',
-    description: 'Extended operational stress metric #15',
-    category: 'Operational Stress & Usage',
-    importance: 1.29,
-    rank: 7,
-    priority: 'medium'
-  },
-  {
-    code: 'OPERATIONAL_STRESS_8',
-    displayName: 'Operational Stress 8',
-    description: 'Stress accumulation pattern #8',
-    category: 'Operational Stress & Usage',
-    importance: 1.27,
+    code: 'ROADWHEEL_ARM_WEAR',
+    displayName: 'Roadwheel Arm Wear',
+    description: 'Suspension arm degradation - Increases failure probability with age',
+    category: 'Age & Wear Components',
+    importance: 2.9,
     rank: 8,
     priority: 'medium'
   },
   {
-    code: 'OPERATIONAL_STRESS_14',
-    displayName: 'Operational Stress 14',
-    description: 'Long-term stress indicator #14',
-    category: 'Operational Stress & Usage',
-    importance: 1.26,
+    code: 'TRACK_LINK_WEAR',
+    displayName: 'Track Link Wear Index',
+    description: 'Track link degradation level - Broken tracks cause immediate immobilization',
+    category: 'Age & Wear Components',
+    importance: 2.7,
+    rank: 9,
+    priority: 'medium'
+  },
+  {
+    code: 'TORSION_BAR_DEGRADATION',
+    displayName: 'Torsion Bar Degradation',
+    description: 'Suspension torsion bar fatigue - Catastrophic collapse risk',
+    category: 'Age & Wear Components',
+    importance: 2.5,
     rank: 10,
     priority: 'medium'
   },
-  {
-    code: 'OPERATIONAL_STRESS_9',
-    displayName: 'Operational Stress 9',
-    description: 'Operational intensity metric #9',
-    category: 'Operational Stress & Usage',
-    importance: 1.17,
-    rank: 17,
-    priority: 'medium'
-  },
-  {
-    code: 'OPERATIONAL_STRESS_1',
-    displayName: 'Operational Stress 1',
-    description: 'Base operational stress level',
-    category: 'Operational Stress & Usage',
-    importance: 1.28,
-    rank: 20,
-    priority: 'medium'
-  },
 
-  // Load & Weight Distribution
+  // TIER 4: Environmental Stress (Medium Priority)
   {
-    code: 'LOAD_DISTRIBUTION_0',
-    displayName: 'Load Distribution 0',
-    description: 'Base load distribution metric',
-    category: 'Load & Weight Distribution',
-    importance: 1.25,
+    code: 'EXTREME_COLD_MILES',
+    displayName: 'Extreme Cold Operations',
+    description: 'Miles operated below -10°F - Track freezing and electrical failures',
+    category: 'Environmental Stress',
+    importance: 2.3,
     rank: 11,
     priority: 'medium'
   },
   {
-    code: 'LOAD_DISTRIBUTION_2',
-    displayName: 'Load Distribution 2',
-    description: 'Load pattern and weight distribution #2',
-    category: 'Load & Weight Distribution',
-    importance: 1.18,
-    rank: 16,
-    priority: 'medium'
-  },
-  {
-    code: 'LOAD_DISTRIBUTION_4',
-    displayName: 'Load Distribution 4',
-    description: 'Load variation during operations #4',
-    category: 'Load & Weight Distribution',
-    importance: 1.12,
-    rank: 20,
-    priority: 'medium'
-  },
-
-  // Component Wear & Degradation
-  {
-    code: 'COMPONENT_WEAR_33',
-    displayName: 'Component Wear 33',
-    description: 'Component degradation indicator #33',
-    category: 'Component Wear & Degradation',
-    importance: 1.23,
+    code: 'EXTREME_HEAT_MILES',
+    displayName: 'Extreme Heat Operations',
+    description: 'Miles operated above 110°F - Cooling system stress and condensation damage',
+    category: 'Environmental Stress',
+    importance: 2.2,
     rank: 12,
     priority: 'medium'
   },
   {
-    code: 'COMPONENT_WEAR_0',
-    displayName: 'Component Wear 0',
-    description: 'Base component wear metric',
-    category: 'Component Wear & Degradation',
-    importance: 1.22,
+    code: 'TERRAIN_SEVERE_MILES',
+    displayName: 'Severe Terrain Mileage',
+    description: 'Miles on extreme terrain - Maximum stress on all vehicle systems',
+    category: 'Environmental Stress',
+    importance: 2.1,
+    rank: 13,
+    priority: 'medium'
+  },
+
+  // TIER 5: Operational Factors (Medium Priority)
+  {
+    code: 'UP_ARMOR_LOAD_HOURS',
+    displayName: 'Up-Armor Load Hours',
+    description: 'Hours with additional armor (12-15% weight increase) - Fatigue multiplier',
+    category: 'Operational Factors',
+    importance: 1.9,
     rank: 14,
     priority: 'medium'
   },
   {
-    code: 'COMPONENT_WEAR_3',
-    displayName: 'Component Wear 3',
-    description: 'Wear pattern analysis #3',
-    category: 'Component Wear & Degradation',
-    importance: 1.15,
+    code: 'COMBAT_OPERATIONS_COUNT',
+    displayName: 'Combat Operations',
+    description: 'Number of high-stress combat maneuvers - Accelerated wear indicator',
+    category: 'Operational Factors',
+    importance: 1.8,
+    rank: 15,
+    priority: 'medium'
+  },
+  {
+    code: 'IDLE_HOURS',
+    displayName: 'Idle Operating Hours',
+    description: 'Turbine hours without movement - Engine wear without productive miles',
+    category: 'Operational Factors',
+    importance: 1.6,
+    rank: 16,
+    priority: 'medium'
+  },
+  {
+    code: 'TURRET_SLEW_CYCLES',
+    displayName: 'Turret Slew Cycles',
+    description: 'Turret rotation cycles - Hydraulic pump and motor wear indicator',
+    category: 'Operational Factors',
+    importance: 1.5,
+    rank: 17,
+    priority: 'medium'
+  },
+
+  // TIER 6: Diagnostic Indicators (Medium-Low Priority)
+  {
+    code: 'FAULT_CODES_ACCUMULATED',
+    displayName: 'Fault Code Count',
+    description: 'Cumulative diagnostic fault codes - Early warning system for failures',
+    category: 'Diagnostic Indicators',
+    importance: 1.4,
+    rank: 18,
+    priority: 'medium'
+  },
+  {
+    code: 'TRANSMISSION_TEMP_EVENTS',
+    displayName: 'Transmission Overheat Events',
+    description: 'Number of transmission overheating incidents - Failure precursor',
+    category: 'Diagnostic Indicators',
+    importance: 1.3,
     rank: 19,
+    priority: 'medium'
+  },
+  {
+    code: 'FUEL_EFFICIENCY_DEGRADATION',
+    displayName: 'Fuel Efficiency Loss',
+    description: 'Percentage decrease from baseline fuel economy - Engine health indicator',
+    category: 'Diagnostic Indicators',
+    importance: 1.2,
+    rank: 20,
     priority: 'medium'
   }
 ];
 
 // Feature categories for UI organization
 export const FEATURE_CATEGORIES = {
-  'System Diagnostics & Performance': ['POWER_SYSTEM_METRIC_9', 'POWER_SYSTEM_METRIC_5', 'POWER_SYSTEM_METRIC_6'],
-  'Temperature & Environmental': ['TEMP_MODERATE_OPERATIONS', 'TEMP_COLD_OPERATIONS', 'TEMP_LOW_OPERATIONS'],
-  'Operational Stress & Usage': ['OPERATIONAL_STRESS_3', 'OPERATIONAL_STRESS_15', 'OPERATIONAL_STRESS_8', 'OPERATIONAL_STRESS_14', 'OPERATIONAL_STRESS_9', 'OPERATIONAL_STRESS_1'],
-  'Load & Weight Distribution': ['LOAD_DISTRIBUTION_0', 'LOAD_DISTRIBUTION_2', 'LOAD_DISTRIBUTION_4'],
-  'Terrain & Mobility': ['TERRAIN_TYPE_4', 'TERRAIN_TYPE_1', 'TERRAIN_TYPE_5'],
-  'Component Wear & Degradation': ['COMPONENT_WEAR_33', 'COMPONENT_WEAR_0', 'COMPONENT_WEAR_3']
+  'Critical Service Life Limiters': ['TRACK_MILES', 'ENGINE_HOURS', 'MAIN_GUN_ROUNDS'],
+  'High-Failure Subsystems': ['FIRE_CONTROL_SYSTEM_FAULTS', 'ELECTRICAL_SYSTEM_FAULTS', 'POWERTRAIN_FAILURES', 'HYDRAULIC_SYSTEM_FAILURES'],
+  'Age & Wear Components': ['ROADWHEEL_ARM_WEAR', 'TRACK_LINK_WEAR', 'TORSION_BAR_DEGRADATION'],
+  'Environmental Stress': ['EXTREME_COLD_MILES', 'EXTREME_HEAT_MILES', 'TERRAIN_SEVERE_MILES'],
+  'Operational Factors': ['UP_ARMOR_LOAD_HOURS', 'COMBAT_OPERATIONS_COUNT', 'IDLE_HOURS', 'TURRET_SLEW_CYCLES'],
+  'Diagnostic Indicators': ['FAULT_CODES_ACCUMULATED', 'TRANSMISSION_TEMP_EVENTS', 'FUEL_EFFICIENCY_DEGRADATION']
 };
 
 // Helper to get all required feature codes
@@ -295,4 +286,14 @@ export const REQUIRED_FEATURES = OPTIMAL_FEATURES.map(f => f.code);
 // Helper to get feature by code
 export function getFeatureMetadata(code: string): FeatureMetadata | undefined {
   return OPTIMAL_FEATURES.find(f => f.code === code);
+}
+
+// Helper to get features by category
+export function getFeaturesByCategory(category: string): FeatureMetadata[] {
+  return OPTIMAL_FEATURES.filter(f => f.category === category);
+}
+
+// Helper to get features by priority
+export function getFeaturesByPriority(priority: 'highest' | 'high' | 'medium'): FeatureMetadata[] {
+  return OPTIMAL_FEATURES.filter(f => f.priority === priority);
 }

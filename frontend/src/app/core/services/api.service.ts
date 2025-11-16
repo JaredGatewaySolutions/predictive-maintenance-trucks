@@ -12,6 +12,7 @@ import {
 } from '../models/prediction.model';
 import { HealthStatus, ApiMetrics } from '../models/health.model';
 import { Explanation } from '../models/explanation.model';
+import { Fleet, ReprocessFleetRequest } from '../models/fleet.model';
 
 @Injectable({
   providedIn: 'root'
@@ -82,6 +83,32 @@ export class ApiService {
    */
   getFleetPredictions(fleetId: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/api/v1/fleets/${fleetId}/predictions`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Create a new empty fleet
+   */
+  createFleet(fleetName: string): Observable<Fleet> {
+    return this.http.post<Fleet>(`${this.apiUrl}/api/v1/fleets`, null, {
+      params: { fleet_name: fleetName }
+    })
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Delete a fleet
+   */
+  deleteFleet(fleetId: string): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/api/v1/fleets/${fleetId}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Reprocess a fleet with new data
+   */
+  reprocessFleet(request: ReprocessFleetRequest): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/api/v1/fleets/${request.fleet_id}/reprocess`, request)
       .pipe(catchError(this.handleError));
   }
 

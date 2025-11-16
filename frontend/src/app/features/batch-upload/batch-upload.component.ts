@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -8,12 +8,18 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTableModule } from '@angular/material/table';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
 import * as Papa from 'papaparse';
 
 import { ApiService } from '../../core/services/api.service';
 import { AnalyticsService } from '../../core/services/analytics.service';
+import { FleetStateService } from '../../core/services/fleet-state.service';
 import { Prediction, BatchPredictionRequest, OPTIMAL_FEATURES, FEATURE_CATEGORIES, REQUIRED_FEATURES } from '../../core/models/prediction.model';
+import { Fleet } from '../../core/models/fleet.model';
+import { NewAbctDialogComponent } from '../new-abct-dialog/new-abct-dialog.component';
 
 @Component({
   selector: 'app-batch-upload',
@@ -27,67 +33,142 @@ import { Prediction, BatchPredictionRequest, OPTIMAL_FEATURES, FEATURE_CATEGORIE
     MatTableModule,
     MatInputModule,
     MatFormFieldModule,
+    MatSelectModule,
+    MatDialogModule,
     FormsModule
   ],
   templateUrl: './batch-upload.component.html',
   styleUrl: './batch-upload.component.scss'
 })
-export class BatchUploadComponent {
+export class BatchUploadComponent implements OnInit, OnDestroy {
   uploading = signal(false);
   processing = signal(false);
   error = signal<string | null>(null);
   success = signal<string | null>(null);
 
   uploadedFile = signal<File | null>(null);
-  fleetName = signal<string>('');
+  abctName = signal<string>('');
   predictions = signal<Prediction[]>([]);
+
+  // Fleet/ABCT management
+  fleets = signal<Fleet[]>([]);
+  selectedFleet = signal<Fleet | null>(null);
+  private fleetsSubscription?: Subscription;
+  private selectedFleetSubscription?: Subscription;
 
   displayedColumns = ['vehicle_id', 'risk_level', 'probability', 'prediction', 'actions'];
 
   // Feature categories for display
+  // Feature categories for display
   featureCategoriesArray = [
     {
-      name: 'System Diagnostics & Performance',
-      features: FEATURE_CATEGORIES['System Diagnostics & Performance'],
+      name: 'Critical Service Life Limiters',
+      features: FEATURE_CATEGORIES['Critical Service Life Limiters'],
       priority: 'highest',
-      icon: 'power_settings_new'
+      icon: 'warning'  // or 'priority_high'
     },
     {
-      name: 'Temperature & Environmental',
-      features: FEATURE_CATEGORIES['Temperature & Environmental'],
+      name: 'High-Failure Subsystems',
+      features: FEATURE_CATEGORIES['High-Failure Subsystems'],
       priority: 'high',
-      icon: 'thermostat'
+      icon: 'error_outline'  // or 'report_problem'
     },
     {
-      name: 'Operational Stress & Usage',
-      features: FEATURE_CATEGORIES['Operational Stress & Usage'],
+      name: 'Age & Wear Components',
+      features: FEATURE_CATEGORIES['Age & Wear Components'],
       priority: 'medium',
-      icon: 'speed'
+      icon: 'build'  // or 'engineering'
     },
     {
-      name: 'Load & Weight Distribution',
-      features: FEATURE_CATEGORIES['Load & Weight Distribution'],
+      name: 'Environmental Stress',
+      features: FEATURE_CATEGORIES['Environmental Stress'],
       priority: 'medium',
-      icon: 'fitness_center'
+      icon: 'thermostat'  // or 'wb_sunny'
     },
     {
-      name: 'Terrain & Mobility',
-      features: FEATURE_CATEGORIES['Terrain & Mobility'],
+      name: 'Operational Factors',
+      features: FEATURE_CATEGORIES['Operational Factors'],
       priority: 'medium',
-      icon: 'terrain'
+      icon: 'speed'  // or 'military_tech'
     },
     {
-      name: 'Component Wear & Degradation',
-      features: FEATURE_CATEGORIES['Component Wear & Degradation'],
+      name: 'Diagnostic Indicators',
+      features: FEATURE_CATEGORIES['Diagnostic Indicators'],
       priority: 'medium',
-      icon: 'build'
+      icon: 'analytics'  // or 'troubleshoot'
     }
   ];
 
   constructor(
     private apiService: ApiService,
-    public analyticsService: AnalyticsService
-  ) {}
+    public analyticsService: AnalyticsService,
+    private fleetStateService: FleetStateService,
+    private dialog: MatDialog
+  ) { }
+
+  ngOnInit(): void {
+    // Subscribe to fleet state changes
+    this.fleetsSubscription = this.fleetStateService.fleets$.subscribe(fleets => {
+      this.fleets.set(fleets);
+    });
+
+    this.selectedFleetSubscription = this.fleetStateService.selectedFleet$.subscribe(fleet => {
+      this.selectedFleet.set(fleet);
+      if (fleet) {
+        this.abctName.set(fleet.fleet_name);
+      }
+    });
+
+    // Load fleets
+    this.loadFleets();
+  }
+
+  ngOnDestroy(): void {
+    this.fleetsSubscription?.unsubscribe();
+    this.selectedFleetSubscription?.unsubscribe();
+  }
+
+  loadFleets(): void {
+    this.apiService.getFleets().subscribe({
+      next: (response) => {
+        this.fleetStateService.setFleets(response.fleets || []);
+      },
+      error: (err) => {
+        console.error('Error loading fleets:', err);
+      }
+    });
+  }
+
+  onFleetSelected(fleet: Fleet): void {
+    this.fleetStateService.setSelectedFleet(fleet);
+    this.abctName.set(fleet.fleet_name);
+  }
+
+  openNewAbctDialog(): void {
+    const dialogRef = this.dialog.open(NewAbctDialogComponent, {
+      width: '500px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // User entered an ABCT name - create the fleet immediately
+        console.log('Creating new ABCT:', result);
+        this.apiService.createFleet(result).subscribe({
+          next: (fleet) => {
+            console.log('✅ ABCT created:', fleet);
+            // Add to state and select it
+            this.fleetStateService.addFleet(fleet);
+            this.abctName.set(result);
+          },
+          error: (err) => {
+            console.error('❌ Failed to create ABCT:', err);
+            this.error.set(`Failed to create ABCT: ${err.message}`);
+          }
+        });
+      }
+    });
+  }
 
   getFeatureDescription(featureName: string): string {
     const feature = OPTIMAL_FEATURES.find(f => f.code === featureName);
@@ -106,8 +187,10 @@ export class BatchUploadComponent {
       }
 
       this.uploadedFile.set(file);
-      // Set default fleet name to filename (without extension)
-      this.fleetName.set(file.name.replace('.csv', ''));
+      // Set default ABCT name to filename (without extension) if none selected
+      if (!this.abctName()) {
+        this.abctName.set(file.name.replace('.csv', ''));
+      }
       this.error.set(null);
       this.success.set(null);
       this.predictions.set([]);
@@ -118,6 +201,12 @@ export class BatchUploadComponent {
     const file = this.uploadedFile();
     if (!file) {
       this.error.set('Please select a file first');
+      return;
+    }
+
+    const abctNameValue = this.abctName().trim();
+    if (!abctNameValue) {
+      this.error.set('ABCT name is required. Please select an existing ABCT or create a new one.');
       return;
     }
 
@@ -186,7 +275,7 @@ export class BatchUploadComponent {
           features: features
         };
       }),
-      fleet_name: this.fleetName() || undefined  // Include fleet name if provided
+      fleet_name: this.abctName()  // ABCT name is now required
     };
 
     console.log(`🚀 Sending batch request with ${batchRequest.vehicles.length} vehicles`);
@@ -198,8 +287,11 @@ export class BatchUploadComponent {
       next: (response) => {
         console.log(`✅ Received ${response.total_count} predictions`);
         this.predictions.set(response.predictions);
-        this.success.set(`Successfully processed ${response.total_count} vehicles`);
+        this.success.set(`Successfully processed ${response.total_count} vehicles for ABCT: ${this.abctName()}`);
         this.processing.set(false);
+
+        // Reload fleets to get the newly created/updated fleet
+        this.loadFleets();
       },
       error: (err) => {
         console.error('❌ Batch prediction error:', err);
@@ -251,11 +343,58 @@ export class BatchUploadComponent {
     this.error.set(null);
     this.success.set(null);
 
+    // Don't clear ABCT name or selection - keep it for next upload
+
     // Reset file input
     const fileInput = document.getElementById('csvFileInput') as HTMLInputElement;
     if (fileInput) {
       fileInput.value = '';
     }
+  }
+
+  reprocessCurrentFleet(): void {
+    const fleet = this.selectedFleet();
+    const file = this.uploadedFile();
+
+    if (!fleet) {
+      this.error.set('Please select an ABCT to reprocess');
+      return;
+    }
+
+    if (!file) {
+      this.error.set('Please select a CSV file to reprocess the ABCT');
+      return;
+    }
+
+    this.processing.set(true);
+    this.error.set(null);
+
+    // Parse CSV and send reprocess request
+    Papa.parse(file, {
+      header: true,
+      dynamicTyping: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        this.apiService.reprocessFleet({
+          fleet_id: fleet.fleet_id,
+          csv_data: results.data
+        }).subscribe({
+          next: (response) => {
+            this.success.set(`Successfully reprocessed ABCT: ${fleet.fleet_name}`);
+            this.processing.set(false);
+            this.loadFleets();
+          },
+          error: (err) => {
+            this.error.set(`Failed to reprocess ABCT: ${err.message}`);
+            this.processing.set(false);
+          }
+        });
+      },
+      error: (error) => {
+        this.error.set(`CSV parsing error: ${error.message}`);
+        this.processing.set(false);
+      }
+    });
   }
 
   getRiskColor(riskLevel: string): string {

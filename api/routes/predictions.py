@@ -436,6 +436,48 @@ async def get_predictions(vehicle_id: str):
         )
 
 
+@router.post("/fleets")
+async def create_fleet(fleet_name: str):
+    """
+    Create a new empty fleet.
+    
+    Args:
+        fleet_name: Name for the new fleet
+    
+    Returns:
+        Created fleet metadata
+    """
+    try:
+        # Generate fleet ID
+        fleet_id = generate_fleet_id()
+        
+        # Create empty fleet
+        fleet_data = {
+            "fleet_id": fleet_id,
+            "fleet_name": fleet_name,
+            "upload_timestamp": datetime.now().isoformat(),
+            "vehicle_count": 0,
+            "vehicle_ids": [],
+            "risk_summary": {
+                "high": 0,
+                "medium": 0,
+                "low": 0
+            }
+        }
+        
+        save_fleet(fleet_data)
+        logger.info(f"✅ Empty fleet created: {fleet_id} - {fleet_name}")
+        
+        return fleet_data
+        
+    except Exception as e:
+        logger.error(f"Error creating fleet: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to create fleet: {str(e)}"
+        )
+
+
 @router.get("/fleets")
 async def get_fleets():
     """
@@ -512,4 +554,193 @@ async def get_fleet_predictions(fleet_id: str):
         raise HTTPException(
             status_code=500,
             detail=f"Failed to retrieve fleet predictions: {str(e)}"
+        )
+
+
+@router.delete("/fleets/{fleet_id}")
+async def delete_fleet(fleet_id: str):
+    """
+    Delete a fleet and its associated prediction data.
+    
+    Args:
+        fleet_id: Fleet identifier
+    
+    Returns:
+        Success message
+    """
+    try:
+        # Load fleets
+        fleets_data = load_fleets()
+        fleet = next((f for f in fleets_data.get("fleets", []) if f["fleet_id"] == fleet_id), None)
+        
+        if not fleet:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Fleet {fleet_id} not found"
+            )
+        
+        # Delete prediction files for vehicles in the fleet
+        for vehicle_id in fleet.get("vehicle_ids", []):
+            file_path = PREDICTIONS_DIR / f"{vehicle_id}.json"
+            if file_path.exists():
+                file_path.unlink()
+                logger.info(f"Deleted predictions for vehicle: {vehicle_id}")
+        
+        # Remove fleet from fleets list
+        fleets_data["fleets"] = [f for f in fleets_data["fleets"] if f["fleet_id"] != fleet_id]
+        
+        # Save updated fleets
+        with open(FLEETS_FILE, 'w') as f:
+            json.dump(fleets_data, f, indent=2)
+        
+        logger.info(f"✓ Fleet deleted: {fleet_id}")
+        
+        return {
+            "message": f"Fleet {fleet_id} deleted successfully",
+            "fleet_name": fleet.get("fleet_name"),
+            "vehicles_deleted": len(fleet.get("vehicle_ids", []))
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting fleet: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to delete fleet: {str(e)}"
+        )
+
+
+@router.post("/fleets/{fleet_id}/reprocess")
+async def reprocess_fleet(fleet_id: str, request: BatchPredictionRequest, api_request: Request):
+    """
+    Reprocess a fleet with new CSV data - replaces existing predictions.
+    
+    Args:
+        fleet_id: Fleet identifier
+        request: Batch prediction request with new vehicle data
+        api_request: FastAPI request object
+    
+    Returns:
+        Updated fleet information with new predictions
+    """
+    try:
+        logger.info(f"🔄 Reprocessing fleet: {fleet_id}")
+        
+        # Load fleets
+        fleets_data = load_fleets()
+        fleet = next((f for f in fleets_data.get("fleets", []) if f["fleet_id"] == fleet_id), None)
+        
+        if not fleet:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Fleet {fleet_id} not found"
+            )
+        
+        # Delete old prediction data for vehicles in the fleet
+        for vehicle_id in fleet.get("vehicle_ids", []):
+            file_path = PREDICTIONS_DIR / f"{vehicle_id}.json"
+            if file_path.exists():
+                file_path.unlink()
+                logger.info(f"Deleted old predictions for vehicle: {vehicle_id}")
+        
+        # Process new predictions using existing batch prediction logic
+        pipeline = api_request.app.state.pipeline
+        
+        if pipeline is None or pipeline.predictor is None:
+            raise HTTPException(
+                status_code=503,
+                detail="Model not loaded. Service unavailable."
+            )
+        
+        predictions = []
+        errors = []
+        
+        # Get expected features from model metadata
+        expected_features = None
+        if pipeline.metadata and 'features' in pipeline.metadata:
+            expected_features = pipeline.metadata['features']
+        
+        # Process each vehicle
+        for vehicle_request in request.vehicles:
+            try:
+                vehicle_df = pd.DataFrame([vehicle_request.features])
+                vehicle_df = convert_to_model_format(
+                    vehicle_df, 
+                    auto_detect=True,
+                    pad_missing_features=True,
+                    expected_features=expected_features
+                )
+                vehicle_series = vehicle_df.iloc[0]
+                result = pipeline.predict_single(vehicle_series)
+                
+                prediction_id = generate_prediction_id()
+                model_version = pipeline.metadata.get("version", "unknown") if pipeline.metadata else "unknown"
+                
+                prediction_response = PredictionResponse(
+                    prediction_id=prediction_id,
+                    vehicle_id=vehicle_request.vehicle_id,
+                    prediction=result["prediction"],
+                    probability=result["probability"],
+                    risk_level=result["risk_level"],
+                    timestamp=result["timestamp"],
+                    model_version=model_version
+                )
+                
+                predictions.append(prediction_response)
+                
+                # Save prediction
+                prediction_dict = prediction_response.dict()
+                prediction_dict["features"] = vehicle_request.features
+                save_prediction(prediction_dict, vehicle_request.vehicle_id)
+                
+            except Exception as e:
+                error_msg = f"Error predicting vehicle {vehicle_request.vehicle_id}: {str(e)}"
+                logger.error(f"❌ {error_msg}")
+                errors.append({"vehicle_id": vehicle_request.vehicle_id, "error": error_msg})
+                continue
+        
+        if not predictions:
+            raise HTTPException(
+                status_code=400,
+                detail="All predictions failed during reprocessing"
+            )
+        
+        # Update fleet metadata
+        updated_fleet = {
+            "fleet_id": fleet_id,
+            "fleet_name": fleet.get("fleet_name"),
+            "upload_timestamp": datetime.now().isoformat(),
+            "vehicle_count": len(predictions),
+            "vehicle_ids": [p.vehicle_id for p in predictions],
+            "risk_summary": {
+                "high": sum(1 for p in predictions if p.risk_level == "HIGH"),
+                "medium": sum(1 for p in predictions if p.risk_level == "MEDIUM"),
+                "low": sum(1 for p in predictions if p.risk_level == "LOW")
+            }
+        }
+        
+        # Replace fleet in fleets list
+        fleets_data["fleets"] = [f if f["fleet_id"] != fleet_id else updated_fleet for f in fleets_data["fleets"]]
+        
+        # Save updated fleets
+        with open(FLEETS_FILE, 'w') as f:
+            json.dump(fleets_data, f, indent=2)
+        
+        logger.info(f"✅ Fleet reprocessed: {fleet_id} ({len(predictions)} vehicles)")
+        
+        return {
+            "message": f"Fleet {fleet_id} reprocessed successfully",
+            "fleet": updated_fleet,
+            "predictions": predictions,
+            "total_count": len(predictions)
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error reprocessing fleet: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to reprocess fleet: {str(e)}"
         )

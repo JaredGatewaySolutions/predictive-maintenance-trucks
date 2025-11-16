@@ -18,6 +18,61 @@
   }
 }
 
+// ABCT Selection Card
+.abct-selection-card {
+  margin-bottom: 24px;
+
+  mat-card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #1976d2;
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .abct-controls {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+
+    .abct-selector {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    button {
+      margin-top: 4px;
+    }
+  }
+
+  .selected-abct-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    background-color: #e3f2fd;
+    border-radius: 4px;
+    color: #1976d2;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    strong {
+      color: #0d47a1;
+    }
+  }
+}
+
 .upload-card {
   margin-bottom: 24px;
 }
@@ -205,7 +260,7 @@
     margin-top: 16px;
   }
 
-  .fleet-name-input {
+  .abct-name-input {
     width: 100%;
     max-width: 400px;
     margin: 1rem auto;

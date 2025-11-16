@@ -1,0 +1,49 @@
+.dialog-container {
+  min-width: 400px;
+  max-width: 500px;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    color: #1976d2;
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+    }
+  }
+}
+
+mat-dialog-content {
+  padding: 20px 24px;
+
+  .dialog-description {
+    margin-bottom: 20px;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  mat-form-field {
+    margin-bottom: 0;
+  }
+}
+
+mat-dialog-actions {
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+  gap: 12px;
+
+  button {
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}

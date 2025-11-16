@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -8,13 +8,18 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { RouterLink } from '@angular/router';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { Subscription } from 'rxjs';
 
 import { ApiService } from '../../core/services/api.service';
 import { AnalyticsService, RiskSummary, CostAnalysis } from '../../core/services/analytics.service';
+import { FleetStateService } from '../../core/services/fleet-state.service';
 import { Prediction } from '../../core/models/prediction.model';
 import { ApiMetrics } from '../../core/models/health.model';
+import { Fleet } from '../../core/models/fleet.model';
+import { NewAbctDialogComponent } from '../new-abct-dialog/new-abct-dialog.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -28,13 +33,14 @@ import { ApiMetrics } from '../../core/models/health.model';
     MatButtonModule,
     MatSelectModule,
     MatFormFieldModule,
+    MatDialogModule,
     RouterLink,
     NgxChartsModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   loading = signal(true);
   error = signal<string | null>(null);
 
@@ -44,9 +50,11 @@ export class DashboardComponent implements OnInit {
   topRiskVehicles = signal<Prediction[]>([]);
   costAnalysis = signal<CostAnalysis | null>(null);
 
-  // Fleet management
-  fleets = signal<any[]>([]);
-  selectedFleet = signal<any | null>(null);
+  // Fleet/ABCT management
+  fleets = signal<Fleet[]>([]);
+  selectedFleet = signal<Fleet | null>(null);
+  private fleetsSubscription?: Subscription;
+  private selectedFleetSubscription?: Subscription;
 
   // Chart data
   riskChartData = signal<any[]>([]);
@@ -56,11 +64,30 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
-    private analyticsService: AnalyticsService
+    private analyticsService: AnalyticsService,
+    private fleetStateService: FleetStateService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
+    // Subscribe to fleet state changes
+    this.fleetsSubscription = this.fleetStateService.fleets$.subscribe(fleets => {
+      this.fleets.set(fleets);
+    });
+
+    this.selectedFleetSubscription = this.fleetStateService.selectedFleet$.subscribe(fleet => {
+      this.selectedFleet.set(fleet);
+      if (fleet) {
+        this.loadFleetPredictions(fleet);
+      }
+    });
+
     this.loadDashboardData();
+  }
+
+  ngOnDestroy(): void {
+    this.fleetsSubscription?.unsubscribe();
+    this.selectedFleetSubscription?.unsubscribe();
   }
 
   loadDashboardData(): void {
@@ -84,12 +111,12 @@ export class DashboardComponent implements OnInit {
   loadFleets(): void {
     this.apiService.getFleets().subscribe({
       next: (response) => {
-        this.fleets.set(response.fleets || []);
+        this.fleetStateService.setFleets(response.fleets || []);
 
-        // Select the most recent fleet by default
-        if (response.fleets && response.fleets.length > 0) {
-          this.selectFleet(response.fleets[0]);
-        } else {
+        // If no fleet selected and fleets exist, select the first one
+        if (!this.selectedFleet() && response.fleets && response.fleets.length > 0) {
+          this.fleetStateService.setSelectedFleet(response.fleets[0]);
+        } else if (!response.fleets || response.fleets.length === 0) {
           // No fleets, generate sample data
           this.generateSamplePredictions();
           this.loading.set(false);
@@ -104,8 +131,11 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  selectFleet(fleet: any): void {
-    this.selectedFleet.set(fleet);
+  selectFleet(fleet: Fleet): void {
+    this.fleetStateService.setSelectedFleet(fleet);
+  }
+
+  loadFleetPredictions(fleet: Fleet): void {
     this.loading.set(true);
 
     // Load predictions for this fleet
@@ -127,8 +157,33 @@ export class DashboardComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading fleet predictions:', err);
-        this.error.set(`Failed to load predictions for fleet: ${fleet.fleet_name}`);
+        this.error.set(`Failed to load predictions for ABCT: ${fleet.fleet_name}`);
         this.loading.set(false);
+      }
+    });
+  }
+
+  openNewAbctDialog(): void {
+    const dialogRef = this.dialog.open(NewAbctDialogComponent, {
+      width: '500px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // User entered an ABCT name - create the fleet immediately
+        console.log('Creating new ABCT:', result);
+        this.apiService.createFleet(result).subscribe({
+          next: (fleet) => {
+            console.log('✅ ABCT created:', fleet);
+            // Add to state and select it
+            this.fleetStateService.addFleet(fleet);
+          },
+          error: (err) => {
+            console.error('❌ Failed to create ABCT:', err);
+            this.error.set(`Failed to create ABCT: ${err.message}`);
+          }
+        });
       }
     });
   }

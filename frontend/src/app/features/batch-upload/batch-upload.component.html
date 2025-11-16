@@ -4,6 +4,56 @@
     <p>Upload a CSV file with <strong>20 optimal M1 Abrams tank sensor readings</strong> (reduced from 170 features!)</p>
   </div>
 
+  <!-- ABCT Selection Section -->
+  <mat-card class="abct-selection-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>military_tech</mat-icon>
+        Select or Create ABCT
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="abct-controls">
+        <mat-form-field appearance="outline" class="abct-selector">
+          <mat-label>Select ABCT</mat-label>
+          <mat-select [(value)]="selectedFleet" (selectionChange)="onFleetSelected($event.value)">
+            @for (fleet of fleets(); track fleet.fleet_id) {
+              <mat-option [value]="fleet">
+                {{ fleet.fleet_name }} ({{ fleet.vehicle_count }} vehicles)
+              </mat-option>
+            }
+          </mat-select>
+          <mat-hint>Select an existing ABCT or create a new one</mat-hint>
+        </mat-form-field>
+
+        <button mat-raised-button color="accent" (click)="openNewAbctDialog()">
+          <mat-icon>add</mat-icon>
+          New ABCT
+        </button>
+
+        @if (selectedFleet() && uploadedFile()) {
+          <button mat-raised-button color="warn" (click)="reprocessCurrentFleet()" [disabled]="processing()">
+            <mat-icon>refresh</mat-icon>
+            Reprocess ABCT
+          </button>
+        }
+      </div>
+
+      @if (abctName()) {
+        <div class="selected-abct-info">
+          <mat-icon>info</mat-icon>
+          <span>
+            @if (selectedFleet()) {
+              Uploading to existing ABCT: <strong>{{ abctName() }}</strong>
+            } @else {
+              Creating new ABCT: <strong>{{ abctName() }}</strong>
+            }
+          </span>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+
   <!-- Required Features Information Panel -->
   <mat-card class="info-card">
     <mat-card-header>
@@ -79,11 +129,18 @@
             {{ uploadedFile()!.name }}
           </p>
 
-          <!-- Fleet Name Input -->
-          <mat-form-field class="fleet-name-input" appearance="outline">
-            <mat-label>Fleet Name</mat-label>
-            <input matInput [(ngModel)]="fleetName" placeholder="Enter fleet name">
-            <mat-hint>Optional: Give this fleet a memorable name</mat-hint>
+          <!-- ABCT Name Display (read-only when fleet is selected) -->
+          <mat-form-field class="abct-name-input" appearance="outline">
+            <mat-label>ABCT Name</mat-label>
+            <input matInput [(ngModel)]="abctName" [readonly]="selectedFleet() !== null" placeholder="Enter ABCT name" required>
+            <mat-icon matPrefix>military_tech</mat-icon>
+            <mat-hint>
+              @if (selectedFleet()) {
+                Selected ABCT (read-only)
+              } @else {
+                Required: Enter name for new ABCT
+              }
+            </mat-hint>
           </mat-form-field>
 
           <div class="upload-actions">
@@ -227,11 +284,12 @@
         <li>Must include all <strong>20 required features</strong> (see above)</li>
         <li>All feature columns should contain numeric values</li>
         <li>Download the template above for the correct format</li>
+        <li><strong>ABCT name is required</strong> - select existing or create new ABCT above</li>
       </ul>
 
       <div class="example">
         <strong>Example CSV structure (first few columns):</strong>
-        <pre>tank_id,POWER_SYSTEM_METRIC_9,TEMP_MODERATE_OPERATIONS,...
+        <pre>tank_id,TRACK_MILES,ENGINE_HOURS,...
 TANK001,1250.5,850.2,...
 TANK002,1380.2,920.5,...</pre>
       </div>
