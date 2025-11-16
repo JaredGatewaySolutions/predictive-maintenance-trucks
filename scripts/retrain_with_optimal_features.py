@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 """
-Retrain Model with Optimal Features - Version 2
-================================================
-Improved retraining with:
-- Optimal threshold (0.1)
-- No probability calibration (can suppress predictions)
-- Higher scale_pos_weight for better recall
-- Optimal 20 features from full dataset analysis
+Retrain Model with Optimal Features
+====================================
+Retrains the production model using the scientifically-selected top 20 features
+from the feature importance analysis.
+
+This script:
+1. Loads the full SCaNIa dataset
+2. Uses only the top 20 most important features
+3. Trains a production-ready model with proper hyperparameters
+4. Saves the model with complete metadata
+5. Compares against the current production model
 
 Author: Predictive Maintenance System
 """
