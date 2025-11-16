@@ -32,8 +32,33 @@
         "precision": 0.0
       },
       "path": "data\\models\\v3_20251115_181440"
+    },
+    {
+      "version": "v4_20251115_223154",
+      "saved_at": "2025-11-15T22:31:54.657518",
+      "metrics": {
+        "accuracy": 0.9036093418259024,
+        "auc_roc": 0.7572351859825776,
+        "recall": 0.0,
+        "precision": 0.0,
+        "specificity": 1.0,
+        "f1_score": 0.0
+      },
+      "path": "data\\models\\v4_20251115_223154"
+    },
+    {
+      "version": "v5_20251115_223658",
+      "saved_at": "2025-11-15T22:36:58.051471",
+      "metrics": {
+        "accuracy": 0.37983014861995756,
+        "auc_roc": 0.7462250753535822,
+        "recall": 0.9229074889867841,
+        "precision": 0.12677760968229954,
+        "specificity": 0.3218984962406015
+      },
+      "path": "data\\models\\v5_20251115_223658"
     }
   ],
-  "current_version": "v3_20251115_181440",
+  "current_version": "v5_20251115_223658",
   "created_at": "2025-11-15T17:32:20.813817"
 }

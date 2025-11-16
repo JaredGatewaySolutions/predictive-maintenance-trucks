@@ -40,16 +40,18 @@ class RiskPredictor:
     - Comprehensive evaluation metrics
     """
     
-    def __init__(self, handle_imbalance=True, calibrate_probabilities=True):
+    def __init__(self, handle_imbalance=True, calibrate_probabilities=True, default_threshold=0.5):
         """
         Initialize risk predictor.
         
         Args:
             handle_imbalance: If True, use scale_pos_weight
             calibrate_probabilities: If True, calibrate predicted probabilities
+            default_threshold: Default probability threshold for predictions (0.1-0.5)
         """
         self.handle_imbalance = handle_imbalance
         self.calibrate_probabilities = calibrate_probabilities
+        self.default_threshold = default_threshold
         self.model = None
         self.calibrated_model = None
         self.scale_pos_weight = None
@@ -59,6 +61,7 @@ class RiskPredictor:
         print("="*80)
         print(f"Imbalance handling: {handle_imbalance}")
         print(f"Probability calibration: {calibrate_probabilities}")
+        print(f"Default threshold: {default_threshold}")
     
     def train(self, X_train, y_train, **xgb_params):
         """
@@ -121,26 +124,24 @@ class RiskPredictor:
             self.calibrated_model.fit(X_train, y_train)
             print("✓ Probabilities calibrated")
     
-    def predict(self, X, use_calibrated=None):
+    def predict(self, X, use_calibrated=None, threshold=None):
         """
         Make predictions.
         
         Args:
             X: Features to predict
             use_calibrated: Use calibrated model (default: use initialization setting)
+            threshold: Probability threshold (default: use default_threshold)
         
         Returns:
             Predictions (0/1)
         """
-        if use_calibrated is None:
-            use_calibrated = self.calibrate_probabilities
+        if threshold is None:
+            threshold = self.default_threshold
         
-        model = self.calibrated_model if use_calibrated else self.model
-        
-        if model is None:
-            raise ValueError("Model not trained yet. Call train() first.")
-        
-        return model.predict(X)
+        # Get probabilities and apply threshold
+        probas = self.predict_proba(X, use_calibrated=use_calibrated)
+        return (probas >= threshold).astype(int)
     
     def predict_proba(self, X, use_calibrated=None):
         """
