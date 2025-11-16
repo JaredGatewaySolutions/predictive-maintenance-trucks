@@ -1,7 +1,8 @@
 <div class="batch-upload-container">
   <div class="upload-header">
     <h1>Batch Upload & Prediction</h1>
-    <p>Upload a CSV file with <strong>20 optimal M1 Abrams tank sensor readings</strong> (reduced from 170 features!)</p>
+    <p>Upload a CSV file with <strong>20 optimal M1 Abrams tank sensor readings</strong> (reduced from 170 features!)
+    </p>
   </div>
 
   <!-- ABCT Selection Section -->
@@ -18,9 +19,9 @@
           <mat-label>Select ABCT</mat-label>
           <mat-select [(value)]="selectedFleet" (selectionChange)="onFleetSelected($event.value)">
             @for (fleet of fleets(); track fleet.fleet_id) {
-              <mat-option [value]="fleet">
-                {{ fleet.fleet_name }} ({{ fleet.vehicle_count }} vehicles)
-              </mat-option>
+            <mat-option [value]="fleet">
+              {{ fleet.fleet_name }} ({{ fleet.vehicle_count }} vehicles)
+            </mat-option>
             }
           </mat-select>
           <mat-hint>Select an existing ABCT or create a new one</mat-hint>
@@ -32,24 +33,24 @@
         </button>
 
         @if (selectedFleet() && uploadedFile()) {
-          <button mat-raised-button color="warn" (click)="reprocessCurrentFleet()" [disabled]="processing()">
-            <mat-icon>refresh</mat-icon>
-            Reprocess ABCT
-          </button>
+        <button mat-raised-button color="warn" (click)="reprocessCurrentFleet()" [disabled]="processing()">
+          <mat-icon>refresh</mat-icon>
+          Reprocess ABCT
+        </button>
         }
       </div>
 
       @if (abctName()) {
-        <div class="selected-abct-info">
-          <mat-icon>info</mat-icon>
-          <span>
-            @if (selectedFleet()) {
-              Uploading to existing ABCT: <strong>{{ abctName() }}</strong>
-            } @else {
-              Creating new ABCT: <strong>{{ abctName() }}</strong>
-            }
-          </span>
-        </div>
+      <div class="selected-abct-info">
+        <mat-icon>info</mat-icon>
+        <span>
+          @if (selectedFleet()) {
+          Uploading to existing ABCT: <strong>{{ abctName() }}</strong>
+          } @else {
+          Creating new ABCT: <strong>{{ abctName() }}</strong>
+          }
+        </span>
+      </div>
       }
     </mat-card-content>
   </mat-card>
@@ -63,35 +64,30 @@
       </mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <p class="info-text">
-        <strong>✨ New Streamlined Format:</strong> We now only require <strong>20 scientifically-selected features</strong>
-        (down from 170!). This reduces data entry time by 80% while maintaining 92.3% prediction accuracy.
-      </p>
-
       <div class="feature-categories">
         @for (category of featureCategoriesArray; track category.name) {
-          <div class="category-group">
-            <h4>
-              <mat-icon [class]="'priority-' + category.priority">{{ category.icon }}</mat-icon>
-              {{ category.name }}
-              <span class="feature-count">({{ category.features.length }} features)</span>
-            </h4>
-            <div class="feature-chips">
-              @for (feature of category.features; track feature) {
-                <span class="feature-chip" [title]="getFeatureDescription(feature)">
-                  {{ feature }}
-                </span>
-              }
-            </div>
+        <div class="category-group">
+          <h4>
+            <mat-icon [class]="'priority-' + category.priority">{{ category.icon }}</mat-icon>
+            {{ category.name }}
+            <span class="feature-count">({{ category.features.length }} features)</span>
+          </h4>
+          <div class="feature-chips">
+            @for (feature of category.features; track feature) {
+            <span class="feature-chip" [title]="getFeatureDescription(feature)">
+              {{ feature }}
+            </span>
+            }
           </div>
+        </div>
         }
       </div>
 
       <div class="download-template">
         <p><strong>📥 Download CSV Template:</strong></p>
-        <a href="data/examples/sample_tanks_20features.csv" download class="template-link">
+        <a href="template.csv" download class="template-link">
           <mat-icon>download</mat-icon>
-          sample_tanks_20features.csv
+          template.csv
         </a>
         <span class="template-note">Use this template with correct column names</span>
       </div>
@@ -111,164 +107,157 @@
         <mat-icon class="upload-icon">cloud_upload</mat-icon>
 
         @if (!uploadedFile()) {
-          <p>Select a CSV file to begin</p>
-          <input
-            type="file"
-            id="csvFileInput"
-            accept=".csv"
-            (change)="onFileSelected($event)"
-            style="display: none"
-          />
-          <button mat-raised-button color="primary" onclick="document.getElementById('csvFileInput').click()">
-            <mat-icon>file_upload</mat-icon>
-            Select File
-          </button>
+        <p>Select a CSV file to begin</p>
+        <input type="file" id="csvFileInput" accept=".csv" (change)="onFileSelected($event)" style="display: none" />
+        <button mat-raised-button color="primary" onclick="document.getElementById('csvFileInput').click()">
+          <mat-icon>file_upload</mat-icon>
+          Select File
+        </button>
         } @else {
-          <p class="file-name">
-            <mat-icon>description</mat-icon>
-            {{ uploadedFile()!.name }}
-          </p>
+        <p class="file-name">
+          <mat-icon>description</mat-icon>
+          {{ uploadedFile()!.name }}
+        </p>
 
-          <!-- ABCT Name Display (read-only when fleet is selected) -->
-          <mat-form-field class="abct-name-input" appearance="outline">
-            <mat-label>ABCT Name</mat-label>
-            <input matInput [(ngModel)]="abctName" [readonly]="selectedFleet() !== null" placeholder="Enter ABCT name" required>
-            <mat-icon matPrefix>military_tech</mat-icon>
-            <mat-hint>
-              @if (selectedFleet()) {
-                Selected ABCT (read-only)
-              } @else {
-                Required: Enter name for new ABCT
-              }
-            </mat-hint>
-          </mat-form-field>
+        <!-- ABCT Name Display (read-only when fleet is selected) -->
+        <mat-form-field class="abct-name-input" appearance="outline">
+          <mat-label>ABCT Name</mat-label>
+          <input matInput [(ngModel)]="abctName" [readonly]="selectedFleet() !== null" placeholder="Enter ABCT name"
+            required>
+          <mat-icon matPrefix>military_tech</mat-icon>
+          <mat-hint>
+            @if (selectedFleet()) {
+            Selected ABCT (read-only)
+            } @else {
+            Required: Enter name for new ABCT
+            }
+          </mat-hint>
+        </mat-form-field>
 
-          <div class="upload-actions">
-            <button mat-raised-button color="primary" (click)="processCSV()" [disabled]="processing()">
-              <mat-icon>play_arrow</mat-icon>
-              Process File
-            </button>
-            <button mat-button (click)="clearResults()">
-              <mat-icon>clear</mat-icon>
-              Clear
-            </button>
-          </div>
+        <div class="upload-actions">
+          <button mat-raised-button color="primary" (click)="processCSV()" [disabled]="processing()">
+            <mat-icon>play_arrow</mat-icon>
+            Process File
+          </button>
+          <button mat-button (click)="clearResults()">
+            <mat-icon>clear</mat-icon>
+            Clear
+          </button>
+        </div>
         }
       </div>
 
       @if (processing()) {
-        <div class="progress-section">
-          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-          <p>Processing predictions...</p>
-        </div>
+      <div class="progress-section">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        <p>Processing predictions...</p>
+      </div>
       }
 
       @if (error()) {
-        <div class="message error-message">
-          <mat-icon>error</mat-icon>
-          <span>{{ error() }}</span>
-        </div>
+      <div class="message error-message">
+        <mat-icon>error</mat-icon>
+        <span>{{ error() }}</span>
+      </div>
       }
 
       @if (success()) {
-        <div class="message success-message">
-          <mat-icon>check_circle</mat-icon>
-          <span>{{ success() }}</span>
-        </div>
+      <div class="message success-message">
+        <mat-icon>check_circle</mat-icon>
+        <span>{{ success() }}</span>
+      </div>
       }
     </mat-card-content>
   </mat-card>
 
   <!-- Results Section -->
   @if (predictions().length > 0) {
-    <mat-card class="results-card">
-      <mat-card-header>
-        <mat-card-title>Prediction Results</mat-card-title>
-        <button mat-raised-button color="accent" (click)="downloadResults()">
-          <mat-icon>download</mat-icon>
-          Download Results
-        </button>
-      </mat-card-header>
-      <mat-card-content>
-        <!-- Summary Stats -->
-        <div class="results-summary">
-          <div class="summary-item">
-            <span class="summary-label">Total Vehicles</span>
-            <span class="summary-value">{{ predictions().length }}</span>
-          </div>
-          <div class="summary-item high-risk">
-            <span class="summary-label">High Risk</span>
-            <span class="summary-value">
-              {{ getHighRiskCount() }}
-            </span>
-          </div>
-          <div class="summary-item medium-risk">
-            <span class="summary-label">Medium Risk</span>
-            <span class="summary-value">
-              {{ getMediumRiskCount() }}
-            </span>
-          </div>
-          <div class="summary-item low-risk">
-            <span class="summary-label">Low Risk</span>
-            <span class="summary-value">
-              {{ getLowRiskCount() }}
-            </span>
-          </div>
+  <mat-card class="results-card">
+    <mat-card-header>
+      <mat-card-title>Prediction Results</mat-card-title>
+      <button mat-raised-button color="accent" (click)="downloadResults()">
+        <mat-icon>download</mat-icon>
+        Download Results
+      </button>
+    </mat-card-header>
+    <mat-card-content>
+      <!-- Summary Stats -->
+      <div class="results-summary">
+        <div class="summary-item">
+          <span class="summary-label">Total Vehicles</span>
+          <span class="summary-value">{{ predictions().length }}</span>
         </div>
+        <div class="summary-item high-risk">
+          <span class="summary-label">High Risk</span>
+          <span class="summary-value">
+            {{ getHighRiskCount() }}
+          </span>
+        </div>
+        <div class="summary-item medium-risk">
+          <span class="summary-label">Medium Risk</span>
+          <span class="summary-value">
+            {{ getMediumRiskCount() }}
+          </span>
+        </div>
+        <div class="summary-item low-risk">
+          <span class="summary-label">Low Risk</span>
+          <span class="summary-value">
+            {{ getLowRiskCount() }}
+          </span>
+        </div>
+      </div>
 
-        <!-- Results Table -->
-        <div class="results-table-container">
-          <table mat-table [dataSource]="predictions()" class="results-table">
-            <ng-container matColumnDef="vehicle_id">
-              <th mat-header-cell *matHeaderCellDef>Vehicle ID</th>
-              <td mat-cell *matCellDef="let pred">{{ pred.vehicle_id }}</td>
-            </ng-container>
+      <!-- Results Table -->
+      <div class="results-table-container">
+        <table mat-table [dataSource]="predictions()" class="results-table">
+          <ng-container matColumnDef="vehicle_id">
+            <th mat-header-cell *matHeaderCellDef>Vehicle ID</th>
+            <td mat-cell *matCellDef="let pred">{{ pred.vehicle_id }}</td>
+          </ng-container>
 
-            <ng-container matColumnDef="risk_level">
-              <th mat-header-cell *matHeaderCellDef>Risk Level</th>
-              <td mat-cell *matCellDef="let pred">
-                <span class="risk-badge" [ngClass]="'risk-' + pred.risk_level.toLowerCase()">
-                  {{ pred.risk_level }}
-                </span>
-              </td>
-            </ng-container>
+          <ng-container matColumnDef="risk_level">
+            <th mat-header-cell *matHeaderCellDef>Risk Level</th>
+            <td mat-cell *matCellDef="let pred">
+              <span class="risk-badge" [ngClass]="'risk-' + pred.risk_level.toLowerCase()">
+                {{ pred.risk_level }}
+              </span>
+            </td>
+          </ng-container>
 
-            <ng-container matColumnDef="probability">
-              <th mat-header-cell *matHeaderCellDef>Probability</th>
-              <td mat-cell *matCellDef="let pred">
-                <div class="probability-bar">
-                  <div
-                    class="probability-fill"
-                    [style.width.%]="pred.probability * 100"
-                    [style.background-color]="getRiskColor(pred.risk_level)">
-                  </div>
-                  <span class="probability-text">{{ formatProbability(pred.probability) }}</span>
+          <ng-container matColumnDef="probability">
+            <th mat-header-cell *matHeaderCellDef>Probability</th>
+            <td mat-cell *matCellDef="let pred">
+              <div class="probability-bar">
+                <div class="probability-fill" [style.width.%]="pred.probability * 100"
+                  [style.background-color]="getRiskColor(pred.risk_level)">
                 </div>
-              </td>
-            </ng-container>
+                <span class="probability-text">{{ formatProbability(pred.probability) }}</span>
+              </div>
+            </td>
+          </ng-container>
 
-            <ng-container matColumnDef="prediction">
-              <th mat-header-cell *matHeaderCellDef>Prediction</th>
-              <td mat-cell *matCellDef="let pred">
-                {{ pred.prediction === 1 ? 'Failure' : 'Normal' }}
-              </td>
-            </ng-container>
+          <ng-container matColumnDef="prediction">
+            <th mat-header-cell *matHeaderCellDef>Prediction</th>
+            <td mat-cell *matCellDef="let pred">
+              {{ pred.prediction === 1 ? 'Failure' : 'Normal' }}
+            </td>
+          </ng-container>
 
-            <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef>Actions</th>
-              <td mat-cell *matCellDef="let pred">
-                <button mat-icon-button [routerLink]="['/vehicle', pred.vehicle_id]">
-                  <mat-icon>visibility</mat-icon>
-                </button>
-              </td>
-            </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let pred">
+              <button mat-icon-button [routerLink]="['/vehicle', pred.vehicle_id]">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </td>
+          </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-          </table>
-        </div>
-      </mat-card-content>
-    </mat-card>
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
   }
 
   <!-- Help Section -->
@@ -280,7 +269,8 @@
       <ul>
         <li>File must be in CSV format (.csv extension)</li>
         <li>First row should contain column headers with <strong>M1 Abrams sensor names</strong></li>
-        <li>Include a <code>tank_id</code> or <code>vehicle_id</code> column (optional - will auto-generate if missing)</li>
+        <li>Include a <code>tank_id</code> or <code>vehicle_id</code> column (optional - will auto-generate if missing)
+        </li>
         <li>Must include all <strong>20 required features</strong> (see above)</li>
         <li>All feature columns should contain numeric values</li>
         <li>Download the template above for the correct format</li>

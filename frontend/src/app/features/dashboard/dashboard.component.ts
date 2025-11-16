@@ -43,6 +43,7 @@ import { NewAbctDialogComponent } from '../new-abct-dialog/new-abct-dialog.compo
 export class DashboardComponent implements OnInit, OnDestroy {
   loading = signal(true);
   error = signal<string | null>(null);
+  hasNoFleets = signal(false);
 
   metrics = signal<ApiMetrics | null>(null);
   predictions = signal<Prediction[]>([]);
@@ -92,12 +93,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   loadDashboardData(): void {
     this.loading.set(true);
+    console.log("loadDashboardData")
     this.error.set(null);
 
     // Load metrics and fleets
     this.apiService.getMetrics().subscribe({
       next: (metrics) => {
         this.metrics.set(metrics);
+        console.log("loadFleets")
         this.loadFleets();
       },
       error: (err) => {
@@ -111,21 +114,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
   loadFleets(): void {
     this.apiService.getFleets().subscribe({
       next: (response) => {
+        console.log(response);
         this.fleetStateService.setFleets(response.fleets || []);
 
         // If no fleet selected and fleets exist, select the first one
         if (!this.selectedFleet() && response.fleets && response.fleets.length > 0) {
+          this.hasNoFleets.set(false);
           this.fleetStateService.setSelectedFleet(response.fleets[0]);
         } else if (!response.fleets || response.fleets.length === 0) {
-          // No fleets, generate sample data
-          this.generateSamplePredictions();
-          this.loading.set(false);
+          // No fleets available - show empty state
+          this.hasNoFleets.set(true);
+          this.clearDashboardData();
         }
+
+        this.loading.set(false);
       },
       error: (err) => {
         console.error('Error loading fleets:', err);
-        // Fallback to sample data
-        this.generateSamplePredictions();
+        this.error.set('Failed to load ABCTs. Please try again.');
         this.loading.set(false);
       }
     });
@@ -163,62 +169,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  openNewAbctDialog(): void {
-    const dialogRef = this.dialog.open(NewAbctDialogComponent, {
-      width: '500px',
-      disableClose: true
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        // User entered an ABCT name - create the fleet immediately
-        console.log('Creating new ABCT:', result);
-        this.apiService.createFleet(result).subscribe({
-          next: (fleet) => {
-            console.log('✅ ABCT created:', fleet);
-            // Add to state and select it
-            this.fleetStateService.addFleet(fleet);
-          },
-          error: (err) => {
-            console.error('❌ Failed to create ABCT:', err);
-            this.error.set(`Failed to create ABCT: ${err.message}`);
-          }
-        });
-      }
-    });
-  }
-
-  private generateSamplePredictions(): void {
-    // Generate sample prediction data for demonstration
-    // In production, this would come from an API endpoint
-    const samplePredictions: Prediction[] = [];
-    const vehicleCount = 50;
-
-    for (let i = 0; i < vehicleCount; i++) {
-      const probability = Math.random();
-      let riskLevel: 'HIGH' | 'MEDIUM' | 'LOW';
-
-      if (probability >= 0.7) {
-        riskLevel = 'HIGH';
-      } else if (probability >= 0.4) {
-        riskLevel = 'MEDIUM';
-      } else {
-        riskLevel = 'LOW';
-      }
-
-      samplePredictions.push({
-        prediction_id: `pred_${Date.now()}_${i}`,
-        vehicle_id: `V${String(1000 + i).padStart(5, '0')}`,
-        prediction: probability >= 0.5 ? 1 : 0,
-        probability: probability,
-        risk_level: riskLevel,
-        timestamp: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
-        model_version: this.metrics()?.model_version || 'v1'
-      });
-    }
-
-    this.predictions.set(samplePredictions);
-    this.analyzeData(samplePredictions);
+  private clearDashboardData(): void {
+    // Clear all prediction data when no fleets are available
+    this.predictions.set([]);
+    this.riskSummary.set(null);
+    this.topRiskVehicles.set([]);
+    this.costAnalysis.set(null);
+    this.riskChartData.set([]);
+    this.costChartData.set([]);
   }
 
   private analyzeData(predictions: Prediction[]): void {

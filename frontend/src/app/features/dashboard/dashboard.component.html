@@ -14,10 +14,6 @@
           </mat-select>
         </mat-form-field>
       }
-      <button mat-raised-button color="accent" (click)="openNewAbctDialog()">
-        <mat-icon>add</mat-icon>
-        New ABCT
-      </button>
       <button mat-raised-button color="primary" (click)="refresh()">
         <mat-icon>refresh</mat-icon>
         Refresh
@@ -41,7 +37,21 @@
     </mat-card>
   }
 
-  @if (!loading() && !error()) {
+  @if (!loading() && !error() && hasNoFleets()) {
+    <mat-card class="empty-state-card">
+      <mat-card-content>
+        <mat-icon class="empty-icon">folder_open</mat-icon>
+        <h2>No ABCTs Found</h2>
+        <p>You haven't uploaded any ABCT data yet. Get started by uploading your first batch of vehicle data.</p>
+        <button mat-raised-button color="primary" routerLink="/batch-upload">
+          <mat-icon>upload</mat-icon>
+          Upload ABCT Data
+        </button>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (!loading() && !error() && !hasNoFleets()) {
     <!-- Model Metrics -->
     <mat-card class="metrics-card">
       <mat-card-header>
