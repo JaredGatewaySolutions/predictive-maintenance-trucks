@@ -1,70 +1,59 @@
-# Frontend - Predictive Maintenance Dashboard
+# PredictiveMaintenanceFrontend
 
-This directory will contain the Angular frontend application.
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.10.
 
-## Future Implementation
+## Development server
 
-The frontend will be built using **Angular** and will include:
-
-### Features
-
-- **Fleet Dashboard**: Overview of all vehicles with risk scores
-- **Vehicle Detail View**: Individual vehicle analysis with SHAP explanations
-- **Cost Analysis**: Visual representation of maintenance cost savings
-- **Batch Upload**: Upload CSV files for batch predictions
-- **Model Metrics**: Display current model performance
-
-### Components (Planned)
-
-```text
-frontend/
-├── src/
-│   ├── app/
-│   │   ├── components/
-│   │   │   ├── dashboard/
-│   │   │   ├── vehicle-detail/
-│   │   │   ├── cost-analysis/
-│   │   │   ├── batch-upload/
-│   │   │   └── model-metrics/
-│   │   ├── services/
-│   │   │   ├── api.service.ts
-│   │   │   ├── prediction.service.ts
-│   │   │   └── auth.service.ts
-│   │   ├── models/
-│   │   └── app.module.ts
-│   ├── assets/
-│   └── environments/
-├── angular.json
-├── package.json
-└── tsconfig.json
-```
-
-### Technology Stack
-
-- **Framework**: Angular 15+
-- **UI Library**: Angular Material / Bootstrap
-- **Charts**: Chart.js or D3.js for visualizations
-- **State Management**: NgRx (if needed)
-- **HTTP Client**: Angular HttpClient for API calls
-
-### API Integration
-
-The frontend will connect to the FastAPI backend at:
-
-- `http://localhost:8000/api/v1/`
-
-### Development
-
-Once implemented, start the dev server with:
+To start a local development server, run:
 
 ```bash
-cd frontend
-npm install
 ng serve
 ```
 
----
+Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
-**Status**: 📦 Placeholder - To be implemented
+## Code scaffolding
 
-For now, focus on completing the **core/** modules and **API** layer.
+Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+
+```bash
+ng generate component component-name
+```
+
+For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+
+```bash
+ng generate --help
+```
+
+## Building
+
+To build the project run:
+
+```bash
+ng build
+```
+
+This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+
+## Running unit tests
+
+To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+
+```bash
+ng test
+```
+
+## Running end-to-end tests
+
+For end-to-end (e2e) testing, run:
+
+```bash
+ng e2e
+```
+
+Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+
+## Additional Resources
+
+For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
