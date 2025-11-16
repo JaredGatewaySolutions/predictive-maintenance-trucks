@@ -1,0 +1,50 @@
+{
+  "fleets": [
+    {
+      "fleet_id": "fleet_20251115_220121_27b2ccac",
+      "fleet_name": "sample_tanks",
+      "upload_timestamp": "2025-11-15T22:01:21.198592",
+      "vehicle_count": 10,
+      "vehicle_ids": [
+        "TANK001",
+        "TANK002",
+        "TANK003",
+        "TANK004",
+        "TANK005",
+        "TANK006",
+        "TANK007",
+        "TANK008",
+        "TANK009",
+        "TANK010"
+      ],
+      "risk_summary": {
+        "high": 0,
+        "medium": 0,
+        "low": 10
+      }
+    },
+    {
+      "fleet_id": "fleet_20251115_221147_6684882d",
+      "fleet_name": "sample_tanks",
+      "upload_timestamp": "2025-11-15T22:11:47.868404",
+      "vehicle_count": 10,
+      "vehicle_ids": [
+        "TANK001",
+        "TANK002",
+        "TANK003",
+        "TANK004",
+        "TANK005",
+        "TANK006",
+        "TANK007",
+        "TANK008",
+        "TANK009",
+        "TANK010"
+      ],
+      "risk_summary": {
+        "high": 0,
+        "medium": 0,
+        "low": 10
+      }
+    }
+  ]
+}

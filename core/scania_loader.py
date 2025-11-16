@@ -7,18 +7,29 @@ Helper script to load and prepare SCANIA Component X dataset for analysis.
 Dataset available at: https://doi.org/10.5878/jvb5-d390
 
 NOTE: This script expects CSV files to be in the 'data/raw' subdirectory
+
+FEATURE NAMING:
+- Internal model format uses Scania codes (171_0, 666_0, etc.)
+- User-facing format uses M1 Abrams names (ENGINE_HOURS, FAULT_CODES, etc.)
+- Use use_abrams_naming=True for user-friendly names
 """
 
 import pandas as pd
 import numpy as np
 import os
+from .feature_mapper import (
+    rename_features, select_features, 
+    ALL_SCANIA_FEATURES, SCANIA_TO_ABRAMS
+)
 
-def load_scania_data(data_dir='data/raw'):
+def load_scania_data(data_dir='data/raw', use_abrams_naming=False, select_top_features=False):
     """
     Load SCANIA Component X dataset files.
     
     Args:
-        data_dir: Directory containing SCANIA CSV files (default: 'data/')
+        data_dir: Directory containing SCANIA CSV files (default: 'data/raw')
+        use_abrams_naming: Rename features to M1 Abrams sensor names (default: False)
+        select_top_features: Select only the 20 mapped features (default: False)
         
     Returns:
         Dictionary with training, validation, and test data
@@ -58,7 +69,17 @@ def load_scania_data(data_dir='data/raw'):
         filepath = os.path.join(data_dir, filename)
         if os.path.exists(filepath):
             print(f"   Loading {filename}...")
-            data[f'train_{key}'] = pd.read_csv(filepath)
+            df = pd.read_csv(filepath)
+            
+            # Apply feature selection if requested
+            if select_top_features and key == 'operational':
+                df = select_features(df, feature_type='scania')
+            
+            # Apply naming convention if requested
+            if use_abrams_naming and key == 'operational':
+                df = rename_features(df, direction='to_abrams')
+            
+            data[f'train_{key}'] = df
             print(f"   ✓ {filename}: {data[f'train_{key}'].shape}")
         else:
             print(f"   ✗ {filename}: NOT FOUND at {filepath}")
@@ -69,7 +90,17 @@ def load_scania_data(data_dir='data/raw'):
         filepath = os.path.join(data_dir, filename)
         if os.path.exists(filepath):
             print(f"   Loading {filename}...")
-            data[f'val_{key}'] = pd.read_csv(filepath)
+            df = pd.read_csv(filepath)
+            
+            # Apply feature selection if requested
+            if select_top_features and key == 'operational':
+                df = select_features(df, feature_type='scania')
+            
+            # Apply naming convention if requested
+            if use_abrams_naming and key == 'operational':
+                df = rename_features(df, direction='to_abrams')
+            
+            data[f'val_{key}'] = df
             print(f"   ✓ {filename}: {data[f'val_{key}'].shape}")
         else:
             print(f"   ✗ {filename}: NOT FOUND at {filepath}")
@@ -80,21 +111,37 @@ def load_scania_data(data_dir='data/raw'):
         filepath = os.path.join(data_dir, filename)
         if os.path.exists(filepath):
             print(f"   Loading {filename}...")
-            data[f'test_{key}'] = pd.read_csv(filepath)
+            df = pd.read_csv(filepath)
+            
+            # Apply feature selection if requested
+            if select_top_features and key == 'operational':
+                df = select_features(df, feature_type='scania')
+            
+            # Apply naming convention if requested
+            if use_abrams_naming and key == 'operational':
+                df = rename_features(df, direction='to_abrams')
+            
+            data[f'test_{key}'] = df
             print(f"   ✓ {filename}: {data[f'test_{key}'].shape}")
         else:
             print(f"   ✗ {filename}: NOT FOUND at {filepath}")
     
+    if use_abrams_naming:
+        print("\n✓ Features renamed to M1 Abrams sensor names")
+    if select_top_features:
+        print(f"✓ Selected top {len(ALL_SCANIA_FEATURES)} features for modeling")
+    
     return data
 
 
-def prepare_scania_for_classification(data, use_last_readout=True):
+def prepare_scania_for_classification(data, use_last_readout=True, use_abrams_naming=False):
     """
     Prepare SCANIA data for classification (failure prediction).
     
     Args:
         data: Dictionary from load_scania_data()
         use_last_readout: If True, use last readout per vehicle (default: True)
+        use_abrams_naming: Return features with M1 Abrams names (default: False)
         
     Returns:
         X, y, vehicle_ids for training
@@ -144,6 +191,12 @@ def prepare_scania_for_classification(data, use_last_readout=True):
                    if col not in ['vehicle_id', 'time_step', 'in_study_repair', 'length_of_study_time_step']]
     
     X = merged[feature_cols].fillna(0)
+    
+    # Apply naming if requested
+    if use_abrams_naming:
+        X = rename_features(X, direction='to_abrams')
+        print("✓ Features renamed to M1 Abrams sensor names")
+    
     y = merged['in_study_repair']
     vehicle_ids = merged['vehicle_id']
     
@@ -158,12 +211,13 @@ def prepare_scania_for_classification(data, use_last_readout=True):
     return X, y, vehicle_ids
 
 
-def prepare_scania_for_survival(data):
+def prepare_scania_for_survival(data, use_abrams_naming=False):
     """
     Prepare SCANIA data for survival analysis.
     
     Args:
         data: Dictionary from load_scania_data()
+        use_abrams_naming: Return features with M1 Abrams names (default: False)
         
     Returns:
         DataFrame with duration, event, and feature columns
@@ -196,6 +250,11 @@ def prepare_scania_for_survival(data):
     survival_data['duration'] = survival_data['length_of_study_time_step']
     survival_data['event'] = survival_data['in_study_repair']
     
+    # Apply naming if requested
+    if use_abrams_naming:
+        survival_data = rename_features(survival_data, direction='to_abrams')
+        print("✓ Features renamed to M1 Abrams sensor names")
+    
     print(f"\n✓ Survival data prepared:")
     print(f"  - Samples: {len(survival_data)}")
     print(f"  - Events (failures): {survival_data['event'].sum()}")
@@ -218,9 +277,12 @@ def get_scania_info():
     DATASET OVERVIEW:
     ================
     
-    Source: SCANIA CV AB & Stockholm University
+    Source: SCANIA CV AB & Stockholm University (adapted for M1 Abrams context)
     Publication: Nature Scientific Data (2025)
     DOI: https://doi.org/10.5878/jvb5-d390
+    
+    NOTE: This system uses the Scania dataset but presents it in the context
+    of M1 Abrams tank predictive maintenance with military-appropriate naming.
     
     SIZE:
     • Total vehicles: 33,000+
@@ -239,7 +301,8 @@ def get_scania_info():
       - Variable 397: 36 bins
     
     • Numerical counters: 8 variables
-      - 171_0, 666_0, 427_0, 837_0, 309_0, 835_0, 370_0, 100_0
+      - Scania codes: 171_0, 666_0, 427_0, 837_0, 309_0, 835_0, 370_0, 100_0
+      - M1 Abrams names: ENGINE_HOURS, FAULT_CODES, COMBAT_STRESS_EVENTS, etc.
       - All are accumulative, suitable for trend analysis
     
     • Specifications: 8 categorical features

@@ -70,6 +70,22 @@ export class ApiService {
   }
 
   /**
+   * Get all available fleets
+   */
+  getFleets(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/api/v1/fleets`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Get predictions for a specific fleet
+   */
+  getFleetPredictions(fleetId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/api/v1/fleets/${fleetId}/predictions`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
    * Error handling
    */
   private handleError(error: HttpErrorResponse) {

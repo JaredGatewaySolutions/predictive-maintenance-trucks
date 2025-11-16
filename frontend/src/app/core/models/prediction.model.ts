@@ -19,6 +19,7 @@ export interface PredictionRequest {
 
 export interface BatchPredictionRequest {
   vehicles: PredictionRequest[];
+  fleet_name?: string;  // Optional fleet name for grouping
 }
 
 export interface BatchPredictionResponse {
@@ -33,4 +34,28 @@ export interface PredictionHistory {
   count: number;
   first_prediction: string;
   last_prediction: string;
+}
+
+export interface Fleet {
+  fleet_id: string;
+  fleet_name: string;
+  upload_timestamp: string;
+  vehicle_count: number;
+  vehicle_ids: string[];
+  risk_summary: {
+    high: number;
+    medium: number;
+    low: number;
+  };
+}
+
+export interface FleetsResponse {
+  fleets: Fleet[];
+  total_count: number;
+}
+
+export interface FleetPredictionsResponse {
+  fleet: Fleet;
+  predictions: any[];
+  total_count: number;
 }

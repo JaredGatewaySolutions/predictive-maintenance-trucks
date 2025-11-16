@@ -54,6 +54,7 @@ class BatchPredictionRequest(BaseModel):
         ..., 
         description="List of vehicles to predict"
     )
+    fleet_name: Optional[str] = Field(None, description="Optional fleet name for grouping")
     
     class Config:
         schema_extra = {

@@ -1,10 +1,13 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { RouterLink } from '@angular/router';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 
@@ -17,11 +20,14 @@ import { ApiMetrics } from '../../core/models/health.model';
   selector: 'app-dashboard',
   imports: [
     CommonModule,
+    FormsModule,
     MatCardModule,
     MatTableModule,
     MatProgressSpinnerModule,
     MatIconModule,
     MatButtonModule,
+    MatSelectModule,
+    MatFormFieldModule,
     RouterLink,
     NgxChartsModule
   ],
@@ -37,6 +43,10 @@ export class DashboardComponent implements OnInit {
   riskSummary = signal<RiskSummary | null>(null);
   topRiskVehicles = signal<Prediction[]>([]);
   costAnalysis = signal<CostAnalysis | null>(null);
+
+  // Fleet management
+  fleets = signal<any[]>([]);
+  selectedFleet = signal<any | null>(null);
 
   // Chart data
   riskChartData = signal<any[]>([]);
@@ -57,21 +67,68 @@ export class DashboardComponent implements OnInit {
     this.loading.set(true);
     this.error.set(null);
 
-    // Load metrics from API
+    // Load metrics and fleets
     this.apiService.getMetrics().subscribe({
       next: (metrics) => {
         this.metrics.set(metrics);
-
-        // For demo, we'll create sample predictions based on the metrics
-        // In production, you'd have an endpoint to get recent predictions
-        this.generateSamplePredictions();
-
-        this.loading.set(false);
+        this.loadFleets();
       },
       error: (err) => {
         this.error.set('Failed to load dashboard data. Please ensure the backend API is running.');
         this.loading.set(false);
         console.error('Dashboard error:', err);
+      }
+    });
+  }
+
+  loadFleets(): void {
+    this.apiService.getFleets().subscribe({
+      next: (response) => {
+        this.fleets.set(response.fleets || []);
+
+        // Select the most recent fleet by default
+        if (response.fleets && response.fleets.length > 0) {
+          this.selectFleet(response.fleets[0]);
+        } else {
+          // No fleets, generate sample data
+          this.generateSamplePredictions();
+          this.loading.set(false);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading fleets:', err);
+        // Fallback to sample data
+        this.generateSamplePredictions();
+        this.loading.set(false);
+      }
+    });
+  }
+
+  selectFleet(fleet: any): void {
+    this.selectedFleet.set(fleet);
+    this.loading.set(true);
+
+    // Load predictions for this fleet
+    this.apiService.getFleetPredictions(fleet.fleet_id).subscribe({
+      next: (response) => {
+        const predictions: Prediction[] = response.predictions.map((p: any) => ({
+          prediction_id: p.prediction_id,
+          vehicle_id: p.vehicle_id,
+          prediction: p.prediction,
+          probability: p.probability,
+          risk_level: p.risk_level,
+          timestamp: p.timestamp,
+          model_version: p.model_version
+        }));
+
+        this.predictions.set(predictions);
+        this.analyzeData(predictions);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading fleet predictions:', err);
+        this.error.set(`Failed to load predictions for fleet: ${fleet.fleet_name}`);
+        this.loading.set(false);
       }
     });
   }

@@ -34,6 +34,14 @@
             <mat-icon>description</mat-icon>
             {{ uploadedFile()!.name }}
           </p>
+
+          <!-- Fleet Name Input -->
+          <mat-form-field class="fleet-name-input" appearance="outline">
+            <mat-label>Fleet Name</mat-label>
+            <input matInput [(ngModel)]="fleetName" placeholder="Enter fleet name">
+            <mat-hint>Optional: Give this fleet a memorable name</mat-hint>
+          </mat-form-field>
+
           <div class="upload-actions">
             <button mat-raised-button color="primary" (click)="processCSV()" [disabled]="processing()">
               <mat-icon>play_arrow</mat-icon>

@@ -1,0 +1,30 @@
+{
+  "full_model": {
+    "accuracy": 0.875,
+    "auc_roc": 0.7369444444444444,
+    "recall": 0.05,
+    "precision": 0.14285714285714285,
+    "specificity": 0.9666666666666667,
+    "f1_score": 0.07407407407407408,
+    "true_negatives": 174,
+    "false_positives": 6,
+    "false_negatives": 19,
+    "true_positives": 1,
+    "total_cost": 5748.0,
+    "model_name": "Full Model (All Features)"
+  },
+  "reduced_model": {
+    "accuracy": 0.83,
+    "auc_roc": 0.6358333333333334,
+    "recall": 0.05,
+    "precision": 0.0625,
+    "specificity": 0.9166666666666666,
+    "f1_score": 0.05555555555555556,
+    "true_negatives": 165,
+    "false_positives": 15,
+    "false_negatives": 19,
+    "true_positives": 1,
+    "total_cost": 5820.0,
+    "model_name": "Reduced Model (20 Features)"
+  }
+}
