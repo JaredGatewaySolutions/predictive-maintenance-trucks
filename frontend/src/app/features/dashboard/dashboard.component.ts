@@ -12,11 +12,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSortModule, MatSort } from '@angular/material/sort';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Router, RouterLink } from '@angular/router';
-import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { NgxChartsModule, Color, ScaleType } from '@swimlane/ngx-charts';
 import { Subscription } from 'rxjs';
 
 import { ApiService } from '../../core/services/api.service';
-import { AnalyticsService, RiskSummary, CostAnalysis } from '../../core/services/analytics.service';
+import { AnalyticsService, RiskSummary, ReadinessAnalysis } from '../../core/services/analytics.service';
 import { FleetStateService } from '../../core/services/fleet-state.service';
 import { Prediction } from '../../core/models/prediction.model';
 import { ApiMetrics } from '../../core/models/health.model';
@@ -53,7 +53,6 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   predictions = signal<Prediction[]>([]);
   riskSummary = signal<RiskSummary | null>(null);
   fleetVehicles = signal<Prediction[]>([]);
-  costAnalysis = signal<CostAnalysis | null>(null);
 
   // Table data source for sorting and filtering
   dataSource = new MatTableDataSource<Prediction>([]);
@@ -67,7 +66,14 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // Chart data
   riskChartData = signal<any[]>([]);
-  costChartData = signal<any[]>([]);
+
+  // Army-themed color scheme for charts
+  riskColorScheme: Color = {
+    name: 'armyRisk',
+    selectable: true,
+    group: ScaleType.Ordinal,
+    domain: ['#8B2500', '#CC7722', '#6B7F39'] // High (burnt red), Medium (amber), Low (OD green)
+  };
 
   displayedColumns = ['vehicle_id', 'risk_level', 'probability', 'timestamp', 'actions'];
 
@@ -77,7 +83,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     private fleetStateService: FleetStateService,
     private dialog: MatDialog,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // Subscribe to fleet state changes
@@ -204,9 +210,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.predictions.set([]);
     this.riskSummary.set(null);
     this.fleetVehicles.set([]);
-    this.costAnalysis.set(null);
     this.riskChartData.set([]);
-    this.costChartData.set([]);
   }
 
   private analyzeData(predictions: Prediction[]): void {
@@ -231,29 +235,19 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
       this.dataSource.sort = this.sort;
     }
 
-    // Calculate cost analysis
-    const costs = this.analyticsService.calculateCostAnalysis(predictions);
-    this.costAnalysis.set(costs);
-
     // Prepare chart data
-    this.prepareChartData(summary, costs);
+    this.prepareChartData(summary);
   }
 
-  private prepareChartData(summary: RiskSummary, costs: CostAnalysis): void {
+  private prepareChartData(summary: RiskSummary): void {
     // Risk distribution chart
     this.riskChartData.set([
       { name: 'High Risk', value: summary.high },
       { name: 'Medium Risk', value: summary.medium },
       { name: 'Low Risk', value: summary.low }
     ]);
-
-    // Cost analysis chart
-    this.costChartData.set([
-      { name: 'False Positive Cost', value: costs.falsePositiveCost },
-      { name: 'False Negative Cost', value: costs.falseNegativeCost },
-      { name: 'Savings', value: costs.savings }
-    ]);
   }
+
 
   getRiskColor(riskLevel: string): string {
     return this.analyticsService.getRiskColor(riskLevel as any);

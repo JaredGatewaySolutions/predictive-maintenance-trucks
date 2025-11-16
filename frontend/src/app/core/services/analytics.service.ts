@@ -8,11 +8,12 @@ export interface RiskSummary {
   total: number;
 }
 
-export interface CostAnalysis {
-  falsePositiveCost: number;
-  falseNegativeCost: number;
-  totalCost: number;
-  savings: number;
+export interface ReadinessAnalysis {
+  combatReady: number;
+  missionCapableLimited: number;
+  notMissionCapable: number;
+  total: number;
+  readinessRate: number; // Percentage of combat ready vehicles
 }
 
 @Injectable({
@@ -63,35 +64,6 @@ export class AnalyticsService {
       .slice(0, count);
   }
 
-  /**
-   * Calculate cost analysis
-   * This is a simplified estimation based on the model's cost-sensitive learning
-   */
-  calculateCostAnalysis(predictions: Prediction[], actualFailures?: number[]): CostAnalysis {
-    // Estimated false positives (vehicles marked high risk but won't fail)
-    const highRiskCount = predictions.filter(p => p.risk_level === 'HIGH').length;
-
-    // Estimated false negatives (vehicles marked low risk but will fail)
-    // Using a conservative estimate based on typical model performance
-    const lowRiskCount = predictions.filter(p => p.risk_level === 'LOW').length;
-    const estimatedFN = Math.round(lowRiskCount * 0.05); // ~5% miss rate
-
-    const falsePositiveCost = highRiskCount * this.FP_COST;
-    const falseNegativeCost = estimatedFN * this.FN_COST;
-    const totalCost = falsePositiveCost + falseNegativeCost;
-
-    // Estimate savings compared to no prediction system
-    // Assume without system, all failures would be missed
-    const worstCaseCost = predictions.length * 0.1 * this.FN_COST; // 10% failure rate
-    const savings = Math.max(0, worstCaseCost - totalCost);
-
-    return {
-      falsePositiveCost,
-      falseNegativeCost,
-      totalCost,
-      savings
-    };
-  }
 
   /**
    * Get risk level color for UI
