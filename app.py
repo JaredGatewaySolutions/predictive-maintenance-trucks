@@ -232,9 +232,9 @@ if __name__ == "__main__":
     ╔══════════════════════════════════════════════════════════════════════════════╗
     ║                    PREDICTIVE MAINTENANCE API                                ║
     ║                                                                              ║
-    ║  Starting FastAPI server...                                                 ║
-    ║  Documentation: http://localhost:8000/docs                                  ║
-    ║  Health check:  http://localhost:8000/health                                ║
+    ║  Starting FastAPI server...                                                  ║
+    ║  Documentation: http://localhost:8000/docs                                   ║
+    ║  Health check:  http://localhost:8000/health                                 ║
     ╚══════════════════════════════════════════════════════════════════════════════╝
     """)
     

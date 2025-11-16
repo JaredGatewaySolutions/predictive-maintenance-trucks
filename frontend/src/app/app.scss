@@ -1,0 +1,75 @@
+.app-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.toolbar-title {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+.active-link {
+  color: #ffc107 !important;
+}
+
+.app-container {
+  display: flex;
+  margin-top: 64px;
+  height: calc(100vh - 64px);
+}
+
+.app-nav {
+  width: 200px;
+  background-color: white;
+  border-right: 1px solid #e0e0e0;
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+
+  a {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    text-decoration: none;
+    color: rgba(0, 0, 0, 0.87);
+    transition: background-color 0.2s;
+
+    mat-icon {
+      margin-right: 12px;
+    }
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+
+    &.active-link {
+      background-color: rgba(63, 81, 181, 0.08);
+      color: #3f51b5;
+      border-right: 3px solid #3f51b5;
+    }
+  }
+}
+
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  background-color: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+  .app-nav {
+    width: 60px;
+
+    a span:not(.mat-icon) {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,188 @@
+<div class="batch-upload-container">
+  <div class="upload-header">
+    <h1>Batch Upload & Prediction</h1>
+    <p>Upload a CSV file with vehicle data to get predictions for multiple vehicles</p>
+  </div>
+
+  <!-- File Upload Section -->
+  <mat-card class="upload-card">
+    <mat-card-header>
+      <mat-card-title>Upload CSV File</mat-card-title>
+      <mat-card-subtitle>
+        CSV should contain vehicle features. Include a 'vehicle_id' column or IDs will be auto-generated.
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="upload-area">
+        <mat-icon class="upload-icon">cloud_upload</mat-icon>
+
+        @if (!uploadedFile()) {
+          <p>Select a CSV file to begin</p>
+          <input
+            type="file"
+            id="csvFileInput"
+            accept=".csv"
+            (change)="onFileSelected($event)"
+            style="display: none"
+          />
+          <button mat-raised-button color="primary" onclick="document.getElementById('csvFileInput').click()">
+            <mat-icon>file_upload</mat-icon>
+            Select File
+          </button>
+        } @else {
+          <p class="file-name">
+            <mat-icon>description</mat-icon>
+            {{ uploadedFile()!.name }}
+          </p>
+          <div class="upload-actions">
+            <button mat-raised-button color="primary" (click)="processCSV()" [disabled]="processing()">
+              <mat-icon>play_arrow</mat-icon>
+              Process File
+            </button>
+            <button mat-button (click)="clearResults()">
+              <mat-icon>clear</mat-icon>
+              Clear
+            </button>
+          </div>
+        }
+      </div>
+
+      @if (processing()) {
+        <div class="progress-section">
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+          <p>Processing predictions...</p>
+        </div>
+      }
+
+      @if (error()) {
+        <div class="message error-message">
+          <mat-icon>error</mat-icon>
+          <span>{{ error() }}</span>
+        </div>
+      }
+
+      @if (success()) {
+        <div class="message success-message">
+          <mat-icon>check_circle</mat-icon>
+          <span>{{ success() }}</span>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Results Section -->
+  @if (predictions().length > 0) {
+    <mat-card class="results-card">
+      <mat-card-header>
+        <mat-card-title>Prediction Results</mat-card-title>
+        <button mat-raised-button color="accent" (click)="downloadResults()">
+          <mat-icon>download</mat-icon>
+          Download Results
+        </button>
+      </mat-card-header>
+      <mat-card-content>
+        <!-- Summary Stats -->
+        <div class="results-summary">
+          <div class="summary-item">
+            <span class="summary-label">Total Vehicles</span>
+            <span class="summary-value">{{ predictions().length }}</span>
+          </div>
+          <div class="summary-item high-risk">
+            <span class="summary-label">High Risk</span>
+            <span class="summary-value">
+              {{ getHighRiskCount() }}
+            </span>
+          </div>
+          <div class="summary-item medium-risk">
+            <span class="summary-label">Medium Risk</span>
+            <span class="summary-value">
+              {{ getMediumRiskCount() }}
+            </span>
+          </div>
+          <div class="summary-item low-risk">
+            <span class="summary-label">Low Risk</span>
+            <span class="summary-value">
+              {{ getLowRiskCount() }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Results Table -->
+        <div class="results-table-container">
+          <table mat-table [dataSource]="predictions()" class="results-table">
+            <ng-container matColumnDef="vehicle_id">
+              <th mat-header-cell *matHeaderCellDef>Vehicle ID</th>
+              <td mat-cell *matCellDef="let pred">{{ pred.vehicle_id }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="risk_level">
+              <th mat-header-cell *matHeaderCellDef>Risk Level</th>
+              <td mat-cell *matCellDef="let pred">
+                <span class="risk-badge" [ngClass]="'risk-' + pred.risk_level.toLowerCase()">
+                  {{ pred.risk_level }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="probability">
+              <th mat-header-cell *matHeaderCellDef>Probability</th>
+              <td mat-cell *matCellDef="let pred">
+                <div class="probability-bar">
+                  <div
+                    class="probability-fill"
+                    [style.width.%]="pred.probability * 100"
+                    [style.background-color]="getRiskColor(pred.risk_level)">
+                  </div>
+                  <span class="probability-text">{{ formatProbability(pred.probability) }}</span>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="prediction">
+              <th mat-header-cell *matHeaderCellDef>Prediction</th>
+              <td mat-cell *matCellDef="let pred">
+                {{ pred.prediction === 1 ? 'Failure' : 'Normal' }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let pred">
+                <button mat-icon-button [routerLink]="['/vehicle', pred.vehicle_id]">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Help Section -->
+  <mat-card class="help-card">
+    <mat-card-header>
+      <mat-card-title>CSV Format Requirements</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <ul>
+        <li>File must be in CSV format (.csv extension)</li>
+        <li>First row should contain column headers</li>
+        <li>Include a <code>vehicle_id</code> column (optional - will auto-generate if missing)</li>
+        <li>All feature columns should contain numeric values</li>
+        <li>The model expects 106 features from sensor readings</li>
+        <li>Missing values will be handled by the model</li>
+      </ul>
+
+      <div class="example">
+        <strong>Example CSV structure:</strong>
+        <pre>vehicle_id,171_0,666_0,427_0,837_0,...
+V00001,76294,0,5,120,...
+V00002,85321,1,3,115,...</pre>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

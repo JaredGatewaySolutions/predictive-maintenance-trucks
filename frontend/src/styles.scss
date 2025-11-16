@@ -1,1 +1,113 @@
 /* You can add global styles to this file, and also import other style files */
+
+// Angular Material Theme
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+// Define custom color palette
+$primary-palette: mat.m2-define-palette(mat.$m2-indigo-palette);
+$accent-palette: mat.m2-define-palette(mat.$m2-pink-palette, A200, A100, A400);
+$warn-palette: mat.m2-define-palette(mat.$m2-red-palette);
+
+// Create the theme
+$theme: mat.m2-define-light-theme((
+  color: (
+    primary: $primary-palette,
+    accent: $accent-palette,
+    warn: $warn-palette,
+  ),
+  typography: mat.m2-define-typography-config(),
+  density: 0,
+));
+
+// Include theme styles for core and all components
+@include mat.all-component-themes($theme);
+
+// Global styles
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+body {
+  margin: 0;
+  background-color: #f5f5f5;
+}
+
+// Risk level colors
+.risk-high {
+  color: #f44336;
+}
+
+.risk-medium {
+  color: #ff9800;
+}
+
+.risk-low {
+  color: #4caf50;
+}
+
+.risk-high-bg {
+  background-color: #ffebee;
+  border-left: 4px solid #f44336;
+}
+
+.risk-medium-bg {
+  background-color: #fff3e0;
+  border-left: 4px solid #ff9800;
+}
+
+.risk-low-bg {
+  background-color: #e8f5e9;
+  border-left: 4px solid #4caf50;
+}
+
+// Utility classes
+.text-center {
+  text-align: center;
+}
+
+.mt-1 { margin-top: 8px; }
+.mt-2 { margin-top: 16px; }
+.mt-3 { margin-top: 24px; }
+.mb-1 { margin-bottom: 8px; }
+.mb-2 { margin-bottom: 16px; }
+.mb-3 { margin-bottom: 24px; }
+.p-2 { padding: 16px; }
+.p-3 { padding: 24px; }
+
+.full-width {
+  width: 100%;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.space-between {
+  justify-content: space-between;
+}
+
+.gap-1 { gap: 8px; }
+.gap-2 { gap: 16px; }
+.gap-3 { gap: 24px; }

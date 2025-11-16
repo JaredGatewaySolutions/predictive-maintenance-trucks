@@ -1,0 +1,207 @@
+<div class="vehicle-detail-container">
+  <div class="vehicle-header">
+    <button mat-icon-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>Vehicle Details: {{ vehicleId() }}</h1>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+      <p>Loading vehicle data...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <mat-card class="error-card">
+      <mat-card-content>
+        <mat-icon color="warn">error</mat-icon>
+        <p>{{ error() }}</p>
+        <button mat-raised-button color="primary" routerLink="/upload">
+          Make Prediction
+        </button>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (!loading() && !error() && prediction()) {
+    <!-- Risk Score Card -->
+    <mat-card class="risk-score-card" [ngClass]="'risk-' + prediction()!.risk_level.toLowerCase()">
+      <mat-card-content>
+        <div class="risk-score-display">
+          <div class="risk-icon">
+            @if (prediction()!.risk_level === 'HIGH') {
+              <mat-icon>warning</mat-icon>
+            } @else if (prediction()!.risk_level === 'MEDIUM') {
+              <mat-icon>info</mat-icon>
+            } @else {
+              <mat-icon>check_circle</mat-icon>
+            }
+          </div>
+          <div class="risk-details">
+            <h2>{{ prediction()!.risk_level }} RISK</h2>
+            <p class="probability">{{ formatProbability(prediction()!.probability) }} failure probability</p>
+            <p class="timestamp">Last updated: {{ formatDate(prediction()!.timestamp) }}</p>
+          </div>
+          <div class="risk-gauge">
+            <svg viewBox="0 0 200 200" class="gauge-svg">
+              <circle cx="100" cy="100" r="80" class="gauge-background" />
+              <circle
+                cx="100"
+                cy="100"
+                r="80"
+                class="gauge-progress"
+                [attr.stroke-dasharray]="(prediction()!.probability * 502.4) + ' 502.4'"
+                [attr.stroke]="getRiskColor(prediction()!.risk_level)" />
+              <text x="100" y="105" class="gauge-text">{{ (prediction()!.probability * 100).toFixed(0) }}%</text>
+            </svg>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Prediction Info -->
+    <div class="info-grid">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Prediction Details</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="info-item">
+            <span class="info-label">Prediction ID</span>
+            <span class="info-value">{{ prediction()!.prediction_id }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Model Version</span>
+            <span class="info-value">{{ prediction()!.model_version }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Prediction Class</span>
+            <span class="info-value">{{ prediction()!.prediction === 1 ? 'Failure Expected' : 'Normal Operation' }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>History Summary</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          @if (history()) {
+            <div class="info-item">
+              <span class="info-label">Total Predictions</span>
+              <span class="info-value">{{ history()!.count }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">First Prediction</span>
+              <span class="info-value">{{ formatDate(history()!.first_prediction) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Last Prediction</span>
+              <span class="info-value">{{ formatDate(history()!.last_prediction) }}</span>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- SHAP Explanation -->
+    @if (explanation()) {
+      <mat-card class="explanation-card">
+        <mat-card-header>
+          <mat-card-title>Why is this vehicle at risk?</mat-card-title>
+          <mat-card-subtitle>SHAP Feature Importance</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p class="explanation-text">{{ explanation()!.explanation_text }}</p>
+
+          <!-- SHAP Chart -->
+          @if (shapChartData().length > 0) {
+            <div class="shap-chart">
+              <ngx-charts-bar-horizontal
+                [results]="shapChartData()"
+                [xAxis]="true"
+                [yAxis]="true"
+                [legend]="false"
+                [showXAxisLabel]="true"
+                [showYAxisLabel]="true"
+                xAxisLabel="SHAP Impact"
+                yAxisLabel="Feature">
+              </ngx-charts-bar-horizontal>
+            </div>
+          }
+
+          <!-- Feature Table -->
+          <table mat-table [dataSource]="explanation()!.top_factors" class="feature-table">
+            <ng-container matColumnDef="feature">
+              <th mat-header-cell *matHeaderCellDef>Feature</th>
+              <td mat-cell *matCellDef="let factor">{{ factor.feature }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="value">
+              <th mat-header-cell *matHeaderCellDef>Value</th>
+              <td mat-cell *matCellDef="let factor">{{ factor.value.toFixed(2) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="shap_value">
+              <th mat-header-cell *matHeaderCellDef>SHAP Value</th>
+              <td mat-cell *matCellDef="let factor">{{ factor.shap_value.toFixed(4) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="effect">
+              <th mat-header-cell *matHeaderCellDef>Effect</th>
+              <td mat-cell *matCellDef="let factor">
+                <span class="effect-badge" [ngClass]="factor.effect.toLowerCase()">
+                  {{ factor.effect }}
+                </span>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </mat-card-content>
+      </mat-card>
+    }
+
+    <!-- Prediction History -->
+    @if (history() && history()!.predictions.length > 1) {
+      <mat-card class="history-card">
+        <mat-card-header>
+          <mat-card-title>Prediction History</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <table mat-table [dataSource]="history()!.predictions" class="history-table">
+            <ng-container matColumnDef="timestamp">
+              <th mat-header-cell *matHeaderCellDef>Date</th>
+              <td mat-cell *matCellDef="let pred">{{ formatDate(pred.timestamp) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="risk_level">
+              <th mat-header-cell *matHeaderCellDef>Risk Level</th>
+              <td mat-cell *matCellDef="let pred">
+                <span class="risk-badge" [ngClass]="'risk-' + pred.risk_level.toLowerCase()">
+                  {{ pred.risk_level }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="probability">
+              <th mat-header-cell *matHeaderCellDef>Probability</th>
+              <td mat-cell *matCellDef="let pred">{{ formatProbability(pred.probability) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="model_version">
+              <th mat-header-cell *matHeaderCellDef>Model Version</th>
+              <td mat-cell *matCellDef="let pred">{{ pred.model_version }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="['timestamp', 'risk_level', 'probability', 'model_version']"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['timestamp', 'risk_level', 'probability', 'model_version'];"></tr>
+          </table>
+        </mat-card-content>
+      </mat-card>
+    }
+  }
+</div>
