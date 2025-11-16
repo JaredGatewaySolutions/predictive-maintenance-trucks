@@ -171,14 +171,20 @@
         <mat-card-title>Fleet Vehicles</mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <table mat-table [dataSource]="fleetVehicles()" class="risk-table clickable-table">
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Filter Vehicles</mat-label>
+          <input matInput (keyup)="applyFilter($event)" placeholder="Search by vehicle ID, risk level, etc." #input>
+          <mat-icon matPrefix>search</mat-icon>
+        </mat-form-field>
+
+        <table mat-table [dataSource]="dataSource" matSort class="risk-table clickable-table">
           <ng-container matColumnDef="vehicle_id">
-            <th mat-header-cell *matHeaderCellDef>Vehicle ID</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Vehicle ID</th>
             <td mat-cell *matCellDef="let vehicle">{{ vehicle.vehicle_id }}</td>
           </ng-container>
 
           <ng-container matColumnDef="risk_level">
-            <th mat-header-cell *matHeaderCellDef>Risk Level</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Risk Level</th>
             <td mat-cell *matCellDef="let vehicle">
               <span class="risk-badge" [ngClass]="'risk-' + vehicle.risk_level.toLowerCase()">
                 {{ vehicle.risk_level }}
@@ -187,12 +193,12 @@
           </ng-container>
 
           <ng-container matColumnDef="probability">
-            <th mat-header-cell *matHeaderCellDef>Probability</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Probability</th>
             <td mat-cell *matCellDef="let vehicle">{{ formatProbability(vehicle.probability) }}</td>
           </ng-container>
 
           <ng-container matColumnDef="timestamp">
-            <th mat-header-cell *matHeaderCellDef>Last Updated</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Updated</th>
             <td mat-cell *matCellDef="let vehicle">{{ formatDate(vehicle.timestamp) }}</td>
           </ng-container>
 

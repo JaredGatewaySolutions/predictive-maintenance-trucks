@@ -262,7 +262,16 @@
 
 .table-card {
   mat-card-content {
-    padding: 0 !important;
+    padding: 16px !important;
+  }
+
+  .filter-field {
+    width: 100%;
+    margin-bottom: 16px;
+
+    mat-icon {
+      color: rgba(0, 0, 0, 0.54);
+    }
   }
 }
 
@@ -272,10 +281,20 @@
   th {
     background-color: #fafafa;
     font-weight: 600;
+
+    // Style for sortable headers
+    &.mat-sort-header-sorted {
+      color: #3f51b5;
+    }
   }
 
   td, th {
     padding: 16px;
+  }
+
+  // Style for sort arrows
+  ::ng-deep .mat-sort-header-arrow {
+    color: #3f51b5;
   }
 
   &.clickable-table {

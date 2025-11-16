@@ -1,13 +1,15 @@
-import { Component, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSortModule, MatSort } from '@angular/material/sort';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Router, RouterLink } from '@angular/router';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
@@ -33,6 +35,8 @@ import { NewAbctDialogComponent } from '../new-abct-dialog/new-abct-dialog.compo
     MatButtonModule,
     MatSelectModule,
     MatFormFieldModule,
+    MatInputModule,
+    MatSortModule,
     MatDialogModule,
     RouterLink,
     NgxChartsModule
@@ -40,7 +44,7 @@ import { NewAbctDialogComponent } from '../new-abct-dialog/new-abct-dialog.compo
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent implements OnInit, OnDestroy {
+export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   loading = signal(true);
   error = signal<string | null>(null);
   hasNoFleets = signal(false);
@@ -50,6 +54,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   riskSummary = signal<RiskSummary | null>(null);
   fleetVehicles = signal<Prediction[]>([]);
   costAnalysis = signal<CostAnalysis | null>(null);
+
+  // Table data source for sorting and filtering
+  dataSource = new MatTableDataSource<Prediction>([]);
+  @ViewChild(MatSort) sort!: MatSort;
 
   // Fleet/ABCT management
   fleets = signal<Fleet[]>([]);
@@ -85,6 +93,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
 
     this.loadDashboardData();
+  }
+
+  ngAfterViewInit(): void {
+    this.dataSource.sort = this.sort;
+
+    // Custom sort for risk_level to prioritize High > Medium > Low
+    this.dataSource.sortingDataAccessor = (item: Prediction, property: string) => {
+      switch (property) {
+        case 'risk_level':
+          const riskOrder: { [key: string]: number } = { 'High': 3, 'Medium': 2, 'Low': 1 };
+          return riskOrder[item.risk_level] || 0;
+        case 'probability':
+          return item.probability;
+        case 'timestamp':
+          return new Date(item.timestamp).getTime();
+        case 'vehicle_id':
+          return item.vehicle_id;
+        default:
+          return '';
+      }
+    };
   }
 
   ngOnDestroy(): void {
@@ -194,6 +223,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
     this.fleetVehicles.set(sortedVehicles);
 
+    // Update data source for table
+    this.dataSource.data = sortedVehicles;
+
+    // Reconnect sort after data is loaded (needed for async data loading)
+    if (this.sort) {
+      this.dataSource.sort = this.sort;
+    }
+
     // Calculate cost analysis
     const costs = this.analyticsService.calculateCostAnalysis(predictions);
     this.costAnalysis.set(costs);
@@ -236,5 +273,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   navigateToVehicle(vehicle: Prediction): void {
     this.router.navigate(['/vehicle', vehicle.vehicle_id]);
+  }
+
+  applyFilter(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 }
