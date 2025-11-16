@@ -11,6 +11,20 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
+.toolbar-logo {
+  height: 40px;
+  width: auto;
+  margin-left: 12px;
+  margin-right: 16px;
+  border-radius: 8px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
 .toolbar-title {
   font-size: 20px;
   font-weight: 600;
