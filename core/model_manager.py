@@ -97,16 +97,18 @@ class ModelManager:
         model: Any,
         metadata: Dict,
         scaler: Optional[Any] = None,
-        version_name: Optional[str] = None
+        version_name: Optional[str] = None,
+        training_data: Optional[Dict] = None
     ) -> str:
         """
-        Save model with metadata and optional scaler.
+        Save model with metadata, optional scaler, and training data sample.
         
         Args:
             model: Trained model object (e.g., RiskPredictor)
             metadata: Model metadata (metrics, config, etc.)
             scaler: Optional data scaler
             version_name: Optional custom version name
+            training_data: Optional dict with 'X_train' and 'y_train' samples for SHAP
         
         Returns:
             Version name of saved model
@@ -135,6 +137,15 @@ class ModelManager:
             with open(scaler_path, 'wb') as f:
                 pickle.dump(scaler, f)
             print(f"✓ Scaler saved: {scaler_path}")
+        
+        # Save training data sample if provided (for SHAP initialization)
+        if training_data is not None:
+            training_data_path = version_dir / "training_data_sample.pkl"
+            with open(training_data_path, 'wb') as f:
+                pickle.dump(training_data, f)
+            print(f"✓ Training data sample saved: {training_data_path}")
+            print(f"   X_train shape: {training_data.get('X_train').shape if 'X_train' in training_data else 'N/A'}")
+            print(f"   y_train shape: {training_data.get('y_train').shape if 'y_train' in training_data else 'N/A'}")
         
         # Add timestamp to metadata
         metadata["version"] = version_name
@@ -189,18 +200,20 @@ class ModelManager:
         self,
         version: Optional[str] = None,
         include_metadata: bool = True,
-        include_scaler: bool = True
+        include_scaler: bool = True,
+        include_training_data: bool = True
     ) -> Dict[str, Any]:
         """
-        Load model (and optionally metadata/scaler).
+        Load model (and optionally metadata/scaler/training_data).
         
         Args:
             version: Model version to load (None = current/latest)
             include_metadata: Include metadata in return dict
             include_scaler: Include scaler in return dict
+            include_training_data: Include training data sample in return dict
         
         Returns:
-            Dictionary with 'model', 'metadata', 'scaler' keys
+            Dictionary with 'model', 'metadata', 'scaler', 'training_data' keys
         """
         # Determine directory
         if version is None:
@@ -243,6 +256,19 @@ class ModelManager:
                 with open(scaler_path, 'rb') as f:
                     result["scaler"] = pickle.load(f)
                 print(f"✓ Scaler loaded")
+        
+        # Load training data sample
+        if include_training_data:
+            training_data_path = model_dir / "training_data_sample.pkl"
+            if training_data_path.exists():
+                with open(training_data_path, 'rb') as f:
+                    result["training_data"] = pickle.load(f)
+                print(f"✓ Training data sample loaded")
+                training_data = result["training_data"]
+                if 'X_train' in training_data:
+                    print(f"   X_train shape: {training_data['X_train'].shape}")
+                if 'y_train' in training_data:
+                    print(f"   y_train shape: {training_data['y_train'].shape}")
         
         print(f"{'='*80}\n")
         

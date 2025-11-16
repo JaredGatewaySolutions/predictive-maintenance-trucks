@@ -260,14 +260,20 @@ class TrainingPipeline:
     def save_model(
         self,
         metadata: Optional[Dict] = None,
-        version_name: Optional[str] = None
+        version_name: Optional[str] = None,
+        X_train_sample: Optional[pd.DataFrame] = None,
+        y_train_sample: Optional[pd.Series] = None,
+        sample_size: int = 100
     ) -> str:
         """
-        Save trained model with metadata.
+        Save trained model with metadata and training data sample for SHAP.
         
         Args:
             metadata: Additional metadata to save
             version_name: Custom version name
+            X_train_sample: Training features sample (if None, uses stored data)
+            y_train_sample: Training labels sample (if None, uses stored data)
+            sample_size: Number of samples to save for SHAP background
         
         Returns:
             Version name of saved model
@@ -292,11 +298,23 @@ class TrainingPipeline:
             "calibrate_probabilities": self.calibrate_probabilities
         })
         
-        # Save model
+        # Prepare training data sample for SHAP
+        training_data = None
+        if X_train_sample is not None and y_train_sample is not None:
+            # Use provided samples
+            training_data = {
+                'X_train': X_train_sample,
+                'y_train': y_train_sample
+            }
+            print(f"\n📊 Including training data sample for SHAP:")
+            print(f"   Samples: {len(X_train_sample)}")
+        
+        # Save model with training data
         version = self.model_manager.save_model(
             model=self.predictor,
             metadata=metadata,
-            version_name=version_name
+            version_name=version_name,
+            training_data=training_data
         )
         
         return version
@@ -343,7 +361,7 @@ class TrainingPipeline:
                 data_splits['X_test']
             )
         
-        # Step 5: Save model
+        # Step 5: Save model with training data sample
         version = None
         if save_model:
             metadata = {
@@ -358,7 +376,20 @@ class TrainingPipeline:
                 "optimal_threshold": float(evaluation['threshold_results']['optimal_threshold']),
                 "cost_savings": float(evaluation['threshold_results']['savings'])
             }
-            version = self.save_model(metadata=metadata)
+            
+            # Sample training data for SHAP (use up to 100 samples)
+            X_train = data_splits['X_train']
+            y_train = data_splits['y_train']
+            sample_size = min(100, len(X_train))
+            sample_indices = np.random.choice(len(X_train), size=sample_size, replace=False)
+            X_train_sample = X_train.iloc[sample_indices]
+            y_train_sample = y_train.iloc[sample_indices]
+            
+            version = self.save_model(
+                metadata=metadata,
+                X_train_sample=X_train_sample,
+                y_train_sample=y_train_sample
+            )
         
         print("\n" + "╔" + "="*78 + "╗")
         print("║" + "PIPELINE COMPLETED SUCCESSFULLY".center(78) + "║")

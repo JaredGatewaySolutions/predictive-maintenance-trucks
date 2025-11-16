@@ -89,14 +89,38 @@ async def startup_event():
                 logger.info(f"  Accuracy: {metrics.get('accuracy', 'N/A')}")
                 logger.info(f"  AUC-ROC: {metrics.get('auc_roc', 'N/A')}")
         
-        # Initialize explainability analyzer (optional - can be slow)
+        # Initialize explainability analyzer with training data
         logger.info("\nInitializing SHAP explainability analyzer...")
         try:
-            # We need training data to initialize SHAP
-            # For now, we'll initialize it lazily or load from cache
-            # In production, you might want to initialize it at startup with cached data
-            app.state.analyzer = None  # Initialize lazily when needed
-            logger.info("✓ Explainability analyzer will be initialized on first use")
+            # Load training data from model
+            loaded = pipeline.model_manager.load_model(include_training_data=True)
+            training_data = loaded.get('training_data')
+            
+            if training_data and 'X_train' in training_data and 'y_train' in training_data:
+                # Initialize analyzer with training data
+                X_train = training_data['X_train']
+                y_train = training_data['y_train']
+                
+                logger.info(f"  Found training data sample: {X_train.shape[0]} samples")
+                
+                # Create ExplainabilityAnalyzer
+                analyzer = ExplainabilityAnalyzer(
+                    model=pipeline.predictor.model,
+                    X_train=X_train,
+                    y_train=y_train
+                )
+                
+                # Initialize SHAP (this may take a few seconds)
+                analyzer.initialize_shap(background_samples=min(100, len(X_train)))
+                
+                app.state.analyzer = analyzer
+                logger.info("✓ SHAP explainability analyzer initialized successfully")
+            else:
+                logger.warning("⚠ No training data found with model")
+                logger.warning("  SHAP explanations will be unavailable")
+                logger.warning("  Re-train the model to include training data sample")
+                app.state.analyzer = None
+                
         except Exception as e:
             logger.warning(f"⚠ Could not initialize explainability analyzer: {e}")
             logger.warning("  SHAP explanations will be unavailable")
