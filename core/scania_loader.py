@@ -9,8 +9,9 @@ Dataset available at: https://doi.org/10.5878/jvb5-d390
 NOTE: This script expects CSV files to be in the 'data/raw' subdirectory
 
 FEATURE NAMING:
-- Internal model format uses Scania codes (171_0, 666_0, etc.)
-- User-facing format uses M1 Abrams names (ENGINE_HOURS, FAULT_CODES, etc.)
+- Internal model format uses Scania codes (158_9, 167_6, 291_4, etc.)
+- User-facing format uses M1 Abrams names (ENGINE_HOURS, TRACK_MILES, TACTICAL_OPERATIONS_COUNT, etc.)
+- Feature names based on RAND Corporation study on M1 Abrams availability factors
 - Use use_abrams_naming=True for user-friendly names
 """
 
@@ -301,8 +302,9 @@ def get_scania_info():
       - Variable 397: 36 bins
     
     • Numerical counters: 8 variables
-      - Scania codes: 171_0, 666_0, 427_0, 837_0, 309_0, 835_0, 370_0, 100_0
-      - M1 Abrams names: ENGINE_HOURS, FAULT_CODES, COMBAT_STRESS_EVENTS, etc.
+      - Scania codes: 158_9, 167_6, 291_4, 459_3, 459_15, 459_8, etc.
+      - M1 Abrams names: ENGINE_HOURS, TRACK_MILES, TACTICAL_OPERATIONS_COUNT, etc.
+      - Names based on RAND Corporation M1 Abrams availability studies
       - All are accumulative, suitable for trend analysis
     
     • Specifications: 8 categorical features

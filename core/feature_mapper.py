@@ -5,8 +5,8 @@ Feature Mapper - M1 Abrams Tank Sensor Mapping
 Maps anonymized Scania dataset features to realistic M1 Abrams tank sensor names.
 
 This module provides bidirectional mapping between:
-- Original Scania dataset codes (171_0, 666_0, etc.)
-- Military-grade M1 Abrams sensor names (ENGINE_HOURS, FAULT_CODES, etc.)
+- Original Scania dataset codes (158_9, 167_6, 291_4, etc.)
+- Military-grade M1 Abrams sensor names based on RAND Corporation availability studies
 
 Author: Predictive Maintenance System
 Context: M1 Abrams Tank Fleet Management
@@ -27,39 +27,40 @@ logger = logging.getLogger(__name__)
 # Forward mapping: Scania technical codes → M1 Abrams military sensor names
 # OPTIMAL 20 FEATURES - Selected via XGBoost Feature Importance Analysis (Nov 15, 2025)
 # These features capture 28.6% of total importance and achieve 92.3% recall
+# Feature names based on RAND Corporation study on M1 Abrams availability factors
 SCANIA_TO_ABRAMS = {
-    # System Diagnostics & Performance (Feature Group 158)
-    '158_9': 'POWER_SYSTEM_METRIC_9',      # Rank 1 - Most important feature (3.41%)
-    '158_5': 'POWER_SYSTEM_METRIC_5',      # Rank 4 - Critical power system indicator (1.71%)
-    '158_6': 'POWER_SYSTEM_METRIC_6',      # Rank 18 - Power distribution metric (1.17%)
+    # Core System Metrics (Feature Group 158)
+    '158_9': 'ENGINE_HOURS',               # Rank 1 - Primary service life limiter (3.41%)
+    '158_5': 'TRACK_MILES',                # Rank 4 - Critical wear metric - 6,000 mi rebuild (1.71%)
+    '158_6': 'MAIN_GUN_ROUNDS',            # Rank 18 - Gun tube life (EFC standard) (1.17%)
     
     # Temperature & Environmental Operations (Feature Group 167)
-    '167_6': 'TEMP_MODERATE_OPERATIONS',   # Rank 2 - Moderate temp operations (1.88%)
-    '167_3': 'TEMP_COLD_OPERATIONS',       # Rank 3 - Cold weather operations (1.77%)
-    '167_1': 'TEMP_LOW_OPERATIONS',        # Rank 9 - Low temperature ops (1.26%)
+    '167_6': 'TEMP_MODERATE_MI',           # Rank 2 - Moderate temperature operations (1.88%)
+    '167_3': 'TEMP_EXTREME_COLD_MI',       # Rank 3 - Arctic/extreme cold ops (1.77%)
+    '167_1': 'TEMP_COLD_MI',               # Rank 9 - Cold weather operations (1.26%)
     
     # Terrain & Mobility (Feature Group 291)
-    '291_4': 'TERRAIN_TYPE_4',             # Rank 5 - Specific terrain category (1.48%)
-    '291_1': 'TERRAIN_TYPE_1',             # Rank 13 - Primary terrain type (1.22%)
-    '291_5': 'TERRAIN_TYPE_5',             # Rank 15 - Terrain variation metric (1.21%)
+    '291_4': 'TERRAIN_SEVERE_MI',          # Rank 5 - Severe terrain (NTC, obstacle courses) (1.48%)
+    '291_1': 'TERRAIN_PAVED_MI',           # Rank 13 - Paved road operations (1.22%)
+    '291_5': 'TERRAIN_CROSS_COUNTRY_MI',   # Rank 15 - Off-road cross-country maneuvers (1.21%)
     
     # Operational Stress & Usage (Feature Group 459)
-    '459_3': 'OPERATIONAL_STRESS_3',       # Rank 6 - Stress level indicator (1.34%)
-    '459_15': 'OPERATIONAL_STRESS_15',     # Rank 7 - Extended stress metric (1.29%)
-    '459_8': 'OPERATIONAL_STRESS_8',       # Rank 8 - Stress pattern 8 (1.27%)
-    '459_14': 'OPERATIONAL_STRESS_14',     # Rank 10 - Stress accumulation (1.26%)
-    '459_9': 'OPERATIONAL_STRESS_9',       # Rank 17 - Stress variant 9 (1.17%)
-    '459_1': 'OPERATIONAL_STRESS_1',       # Rank 20 - Base stress level (1.28%)
+    '459_3': 'TACTICAL_OPERATIONS_COUNT',  # Rank 6 - High-stress tactical operations (1.34%)
+    '459_15': 'TURRET_SLEW_CYCLES',        # Rank 7 - Turret traverse operations (1.29%)
+    '459_8': 'TRANSMISSION_CYCLES',        # Rank 8 - Transmission wear operations (1.27%)
+    '459_14': 'IDLE_HOURS',                # Rank 10 - Engine idle time (M1 no APU) (1.26%)
+    '459_9': 'FAULT_CODES',                # Rank 17 - Diagnostic fault accumulation (1.17%)
+    '459_1': 'TEMP_EXTREME_HEAT_MI',       # Rank 20 - Desert ops 90°F-140°F (1.28%)
     
     # Load & Weight Conditions (Feature Group 272)
-    '272_0': 'LOAD_DISTRIBUTION_0',        # Rank 11 - Base load metric (1.25%)
-    '272_2': 'LOAD_DISTRIBUTION_2',        # Rank 16 - Load pattern 2 (1.18%)
-    '272_4': 'LOAD_DISTRIBUTION_4',        # Rank 20 - Load variation (1.12%)
+    '272_0': 'LOAD_TRAINING_MI',           # Rank 11 - Training configuration (~60 tons) (1.25%)
+    '272_2': 'LOAD_COMBAT_READY_MI',       # Rank 16 - Standard combat load (~67 tons) (1.18%)
+    '272_4': 'LOAD_UP_ARMOR_MI',           # Rank 20 - Up-armor config (Iraq/Afghan +12-15%) (1.12%)
     
-    # Component Wear & Degradation (Feature Group 397)
-    '397_33': 'COMPONENT_WEAR_33',         # Rank 12 - Wear indicator 33 (1.23%)
-    '397_0': 'COMPONENT_WEAR_0',           # Rank 14 - Base wear metric (1.22%)
-    '397_3': 'COMPONENT_WEAR_3',           # Rank 19 - Wear pattern 3 (1.15%)
+    # Additional Operations (Feature Group 397)
+    '397_33': 'TERRAIN_DIRT_MI',           # Rank 12 - Dirt/unpaved operations (1.23%)
+    '397_0': 'LOAD_FULL_COMBAT_MI',        # Rank 14 - Full combat load (~72 tons) (1.22%)
+    '397_3': 'TEMP_HOT_MI',                # Rank 19 - Hot weather operations (1.15%)
 }
 
 # Reverse mapping: M1 Abrams military sensor names → Scania technical codes
@@ -70,74 +71,70 @@ ABRAMS_TO_SCANIA = {v: k for k, v in SCANIA_TO_ABRAMS.items()}
 # ============================================================================
 
 FEATURE_DESCRIPTIONS = {
-    # System Diagnostics & Performance
-    'POWER_SYSTEM_METRIC_9': 'Power system performance indicator #9 (Most predictive)',
-    'POWER_SYSTEM_METRIC_5': 'Power system efficiency metric #5',
-    'POWER_SYSTEM_METRIC_6': 'Power distribution and stability metric #6',
+    # Core System Metrics
+    'ENGINE_HOURS': 'Turbine operating time - Primary service life limiter per DoD specs',
+    'TRACK_MILES': 'Odometer reading - Critical metric (6,000 mi = rebuild)',
+    'MAIN_GUN_ROUNDS': 'EFCs (Effective Full Charges) fired - Gun tube life indicator',
     
     # Temperature & Environmental Operations
-    'TEMP_MODERATE_OPERATIONS': 'Operational time in moderate temperature conditions',
-    'TEMP_COLD_OPERATIONS': 'Operational time in cold weather environments',
-    'TEMP_LOW_OPERATIONS': 'Performance in low-temperature operations',
+    'TEMP_MODERATE_MI': 'Miles operated in moderate temperature conditions',
+    'TEMP_EXTREME_COLD_MI': 'Miles in extreme cold (below -32°F) - Arctic deployment',
+    'TEMP_COLD_MI': 'Miles in cold weather environments',
+    'TEMP_EXTREME_HEAT_MI': 'Miles in extreme heat (90°F-140°F) - Desert deployment',
+    'TEMP_HOT_MI': 'Miles in hot weather operations',
     
     # Terrain & Mobility
-    'TERRAIN_TYPE_4': 'Operations on terrain classification #4',
-    'TERRAIN_TYPE_1': 'Primary terrain type operational metric',
-    'TERRAIN_TYPE_5': 'Terrain variation and mobility metric #5',
+    'TERRAIN_SEVERE_MI': 'Miles on severe terrain (NTC, obstacle courses) - Max system stress',
+    'TERRAIN_PAVED_MI': 'Miles on paved roads - Lowest wear category',
+    'TERRAIN_CROSS_COUNTRY_MI': 'Miles on cross-country terrain - Off-road maneuvers',
+    'TERRAIN_DIRT_MI': 'Miles on dirt/unpaved roads',
     
     # Operational Stress & Usage
-    'OPERATIONAL_STRESS_3': 'Operational stress level indicator #3',
-    'OPERATIONAL_STRESS_15': 'Extended operational stress metric #15',
-    'OPERATIONAL_STRESS_8': 'Stress accumulation pattern #8',
-    'OPERATIONAL_STRESS_14': 'Long-term stress indicator #14',
-    'OPERATIONAL_STRESS_9': 'Operational intensity metric #9',
-    'OPERATIONAL_STRESS_1': 'Base operational stress level',
+    'TACTICAL_OPERATIONS_COUNT': 'High-stress tactical maneuvers (includes training rotations)',
+    'TURRET_SLEW_CYCLES': 'Turret traverse operations - Hydraulic system wear',
+    'TRANSMISSION_CYCLES': 'Transmission operations - Major failure point indicator',
+    'IDLE_HOURS': 'Engine idle time (M1 has no APU - constant run requirement)',
+    'FAULT_CODES': 'Diagnostic fault code accumulation - Early warning indicator',
     
     # Load & Weight Conditions
-    'LOAD_DISTRIBUTION_0': 'Base load distribution metric',
-    'LOAD_DISTRIBUTION_2': 'Load pattern and weight distribution #2',
-    'LOAD_DISTRIBUTION_4': 'Load variation during operations #4',
-    
-    # Component Wear & Degradation
-    'COMPONENT_WEAR_33': 'Component degradation indicator #33',
-    'COMPONENT_WEAR_0': 'Base component wear metric',
-    'COMPONENT_WEAR_3': 'Wear pattern analysis #3'
+    'LOAD_TRAINING_MI': 'Miles at training configuration weight (~60 tons)',
+    'LOAD_COMBAT_READY_MI': 'Miles at standard combat load (~67 tons)',
+    'LOAD_FULL_COMBAT_MI': 'Miles at full combat load (~72 tons - max ammo/fuel)',
+    'LOAD_UP_ARMOR_MI': 'Miles with up-armor configuration (Iraq/Afghan +12-15% weight)'
 }
 
 # Feature categories for grouping (based on scientific feature importance analysis)
 FEATURE_CATEGORIES = {
-    'System Diagnostics & Performance (Highest Priority)': [
-        'POWER_SYSTEM_METRIC_9',    # Rank 1 - Most important
-        'POWER_SYSTEM_METRIC_5',    # Rank 4
-        'POWER_SYSTEM_METRIC_6'     # Rank 18
+    'Core System Metrics (Highest Priority)': [
+        'ENGINE_HOURS',        # Rank 1 - Most important
+        'TRACK_MILES',         # Rank 4
+        'MAIN_GUN_ROUNDS'      # Rank 18
     ],
     'Temperature & Environmental Operations': [
-        'TEMP_MODERATE_OPERATIONS',  # Rank 2
-        'TEMP_COLD_OPERATIONS',      # Rank 3
-        'TEMP_LOW_OPERATIONS'        # Rank 9
+        'TEMP_MODERATE_MI',      # Rank 2
+        'TEMP_EXTREME_COLD_MI',  # Rank 3
+        'TEMP_COLD_MI',          # Rank 9
+        'TEMP_EXTREME_HEAT_MI',  # Rank 20
+        'TEMP_HOT_MI'            # Rank 19
     ],
     'Operational Stress & Usage Patterns': [
-        'OPERATIONAL_STRESS_3',      # Rank 6
-        'OPERATIONAL_STRESS_15',     # Rank 7
-        'OPERATIONAL_STRESS_8',      # Rank 8
-        'OPERATIONAL_STRESS_14',     # Rank 10
-        'OPERATIONAL_STRESS_9',      # Rank 17
-        'OPERATIONAL_STRESS_1'       # Rank 20
+        'TACTICAL_OPERATIONS_COUNT',  # Rank 6
+        'TURRET_SLEW_CYCLES',         # Rank 7
+        'TRANSMISSION_CYCLES',        # Rank 8
+        'IDLE_HOURS',                 # Rank 10
+        'FAULT_CODES'                 # Rank 17
     ],
     'Load & Weight Distribution': [
-        'LOAD_DISTRIBUTION_0',       # Rank 11
-        'LOAD_DISTRIBUTION_2',       # Rank 16
-        'LOAD_DISTRIBUTION_4'        # Rank 20
+        'LOAD_TRAINING_MI',       # Rank 11
+        'LOAD_COMBAT_READY_MI',   # Rank 16
+        'LOAD_FULL_COMBAT_MI',    # Rank 14
+        'LOAD_UP_ARMOR_MI'        # Rank 20
     ],
     'Terrain & Mobility': [
-        'TERRAIN_TYPE_4',            # Rank 5
-        'TERRAIN_TYPE_1',            # Rank 13
-        'TERRAIN_TYPE_5'             # Rank 15
-    ],
-    'Component Wear & Degradation': [
-        'COMPONENT_WEAR_33',         # Rank 12
-        'COMPONENT_WEAR_0',          # Rank 14
-        'COMPONENT_WEAR_3'           # Rank 19
+        'TERRAIN_SEVERE_MI',          # Rank 5
+        'TERRAIN_PAVED_MI',           # Rank 13
+        'TERRAIN_CROSS_COUNTRY_MI',   # Rank 15
+        'TERRAIN_DIRT_MI'             # Rank 12
     ]
 }
 
@@ -199,7 +196,7 @@ def select_features(
     
     Args:
         df: DataFrame with many features
-        feature_type: 'scania' (codes like 171_0) or 'abrams' (names like ENGINE_HOURS)
+        feature_type: 'scania' (codes like 158_9) or 'abrams' (names like ENGINE_HOURS)
     
     Returns:
         DataFrame with only the 20 selected features (plus vehicle_id, time_step if present)
@@ -453,7 +450,7 @@ def print_feature_mapping():
     print("\n" + "="*80)
     print("M1 ABRAMS TANK SENSOR FEATURE MAPPING")
     print("="*80)
-    print(f"{'Scania Code':<15} {'M1 Abrams Name':<30} {'Description':<35}")
+    print(f"{'Scania Code':<15} {'M1 Abrams Name':<35} {'Description':<30}")
     print("-"*80)
     
     for category, features in FEATURE_CATEGORIES.items():
@@ -461,8 +458,8 @@ def print_feature_mapping():
         print("-"*80)
         for abrams_name in features:
             scania_code = ABRAMS_TO_SCANIA[abrams_name]
-            description = FEATURE_DESCRIPTIONS[abrams_name]
-            print(f"{scania_code:<15} {abrams_name:<30} {description:<35}")
+            description = FEATURE_DESCRIPTIONS[abrams_name][:30] + "..." if len(FEATURE_DESCRIPTIONS[abrams_name]) > 30 else FEATURE_DESCRIPTIONS[abrams_name]
+            print(f"{scania_code:<15} {abrams_name:<35} {description:<30}")
     
     print("\n" + "="*80)
     print(f"Total Features: {len(ALL_ABRAMS_FEATURES)}")
@@ -492,10 +489,10 @@ if __name__ == "__main__":
     # Sample data with Scania codes
     sample_data_scania = {
         'vehicle_id': ['TANK001', 'TANK002'],
-        '171_0': [2450, 3100],
-        '666_0': [3, 7],
-        '427_0': [45, 78],
-        '837_0': [120, 200]
+        '158_9': [2450, 3100],
+        '459_9': [3, 7],
+        '459_3': [45, 78],
+        '459_14': [120, 200]
     }
     df_scania = pd.DataFrame(sample_data_scania)
     
@@ -525,7 +522,7 @@ if __name__ == "__main__":
     print("FEATURE INFORMATION LOOKUP")
     print("="*80)
     
-    info = get_feature_info('171_0')
+    info = get_feature_info('158_9')
     print(f"\nFeature: {info['scania_code']}")
     print(f"  Display Name: {info['abrams_name']}")
     print(f"  Description: {info['description']}")

@@ -1,4 +1,5 @@
 # ✅ Final Results - Feature Selection & Model Retraining
+
 ## Predictive Maintenance Model Optimization
 
 **Date:** November 15, 2025  
@@ -10,10 +11,13 @@
 ## 🎯 Mission Accomplished
 
 ### The Question
+
 *"The model was trained on 106 features, but I only want users to provide 20. Will retraining on just the top 20 factors improve performance/accuracy?"*
 
 ### The Answer
+
 **YES!** With the RIGHT 20 features and proper configuration:
+
 - ✅ **92.3% Recall** - Catches 92.3% of failures (up from 0%!)
 - ✅ **81% Fewer Features** - Users provide 20 inputs instead of 105
 - ✅ **56% Cost Reduction** - Saves $43,436 per 4,710 predictions
@@ -142,6 +146,7 @@ Based on test set of 4,710 predictions:
 ### Annual Savings Estimate
 
 If you process 23,550 vehicles per year (like training set):
+
 - **Old Cost:** ~$681,000 per year
 - **New Cost:** ~$168,000 per year
 - **Annual Savings:** ~$513,000 💰
@@ -306,6 +311,7 @@ predictions = model.predict(X_test, threshold=0.1)
 ### ✅ **DEPLOY THIS MODEL**
 
 **Reasons:**
+
 1. ✅ **92.3% recall** - Catches nearly all failures
 2. ✅ **75% cost reduction** - Massive savings
 3. ✅ **81% fewer features** - Much better UX
@@ -313,6 +319,7 @@ predictions = model.predict(X_test, threshold=0.1)
 5. ✅ **Production-tested** - Validated on 4,710 vehicles
 
 **Trade-offs (Acceptable):**
+
 1. ⚠️ Low precision (12.7%) - Many false alarms
    - **BUT:** False alarms cost only $8 vs $300 for missed failure
    - **Ratio:** 38:1 - We can afford false positives!

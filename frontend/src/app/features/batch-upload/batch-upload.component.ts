@@ -13,7 +13,7 @@ import * as Papa from 'papaparse';
 
 import { ApiService } from '../../core/services/api.service';
 import { AnalyticsService } from '../../core/services/analytics.service';
-import { Prediction, BatchPredictionRequest } from '../../core/models/prediction.model';
+import { Prediction, BatchPredictionRequest, OPTIMAL_FEATURES, FEATURE_CATEGORIES, REQUIRED_FEATURES } from '../../core/models/prediction.model';
 
 @Component({
   selector: 'app-batch-upload',
@@ -44,10 +44,55 @@ export class BatchUploadComponent {
 
   displayedColumns = ['vehicle_id', 'risk_level', 'probability', 'prediction', 'actions'];
 
+  // Feature categories for display
+  featureCategoriesArray = [
+    {
+      name: 'System Diagnostics & Performance',
+      features: FEATURE_CATEGORIES['System Diagnostics & Performance'],
+      priority: 'highest',
+      icon: 'power_settings_new'
+    },
+    {
+      name: 'Temperature & Environmental',
+      features: FEATURE_CATEGORIES['Temperature & Environmental'],
+      priority: 'high',
+      icon: 'thermostat'
+    },
+    {
+      name: 'Operational Stress & Usage',
+      features: FEATURE_CATEGORIES['Operational Stress & Usage'],
+      priority: 'medium',
+      icon: 'speed'
+    },
+    {
+      name: 'Load & Weight Distribution',
+      features: FEATURE_CATEGORIES['Load & Weight Distribution'],
+      priority: 'medium',
+      icon: 'fitness_center'
+    },
+    {
+      name: 'Terrain & Mobility',
+      features: FEATURE_CATEGORIES['Terrain & Mobility'],
+      priority: 'medium',
+      icon: 'terrain'
+    },
+    {
+      name: 'Component Wear & Degradation',
+      features: FEATURE_CATEGORIES['Component Wear & Degradation'],
+      priority: 'medium',
+      icon: 'build'
+    }
+  ];
+
   constructor(
     private apiService: ApiService,
     public analyticsService: AnalyticsService
   ) {}
+
+  getFeatureDescription(featureName: string): string {
+    const feature = OPTIMAL_FEATURES.find(f => f.code === featureName);
+    return feature ? `${feature.displayName}: ${feature.description} (Importance: ${feature.importance}%)` : featureName;
+  }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -104,6 +149,23 @@ export class BatchUploadComponent {
 
     console.log(`📊 Parsed ${data.length} rows from CSV`);
     console.log('Sample row:', data[0]);
+
+    // Validate CSV has required features
+    const csvColumns = Object.keys(data[0]);
+    const missingFeatures = REQUIRED_FEATURES.filter(feature => !csvColumns.includes(feature));
+
+    if (missingFeatures.length > 0) {
+      console.warn('⚠️ Missing required features:', missingFeatures);
+      this.error.set(
+        `CSV is missing ${missingFeatures.length} required features. ` +
+        `Missing: ${missingFeatures.slice(0, 5).join(', ')}${missingFeatures.length > 5 ? '...' : ''}. ` +
+        `Please download the template above for the correct format.`
+      );
+      this.processing.set(false);
+      return;
+    }
+
+    console.log('✅ All 20 required features found in CSV');
 
     // Convert CSV data to batch prediction request
     const batchRequest: BatchPredictionRequest = {
