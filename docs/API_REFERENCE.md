@@ -299,30 +299,6 @@ Predictions are saved to `data/predictions/`:
 
 ---
 
-## Production Deployment
-
-### Docker
-
-```bash
-# Build image
-docker build -t predictive-maintenance-api .
-
-# Run container
-docker run -p 8000:8000 predictive-maintenance-api
-```
-
-### Kubernetes
-
-Deploy using Kubernetes manifests for scalability and high availability.
-
-### Cloud Options
-
-- **AWS**: Deploy on ECS/Fargate or Lambda
-- **Azure**: Deploy on App Service or Container Instances
-- **GCP**: Deploy on Cloud Run or GKE
-
----
-
 ## Support
 
 For issues or questions:

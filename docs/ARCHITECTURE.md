@@ -4,11 +4,11 @@
 
 ```text
 predictive-maintenance-trucks/
-├── app.py                          # [FUTURE] FastAPI application entry point
-├── requirements.txt                # Python dependencies
+├── app.py                         # FastAPI application entry point
+├── requirements.txt               # Python dependencies
 ├── test_pipeline.py               # Pipeline testing script
 │
-├── core/                          # ✅ COMPLETED - Core ML business logic
+├── core/                          # Core ML business logic
 │   ├── __init__.py                # Module exports
 │   ├── scania_loader.py           # Data ingestion from SCANIA dataset
 │   ├── risk_predictor.py          # XGBoost-based failure prediction
@@ -16,7 +16,7 @@ predictive-maintenance-trucks/
 │   ├── pipeline.py                # TrainingPipeline & PredictionPipeline
 │   └── model_manager.py           # Model persistence & versioning
 │
-├── api/                           # [FUTURE] REST API layer
+├── api/                           # REST API layer
 │   ├── __init__.py
 │   ├── routes/
 │   │   ├── predictions.py         # POST /predict, GET /predictions
@@ -30,17 +30,17 @@ predictive-maintenance-trucks/
 │       ├── auth.py
 │       └── logging.py
 │
-├── frontend/                      # ✅ CREATED - Angular app placeholder
+├── frontend/                      # Angular app placeholder
 │   └── README.md                  # Implementation guide
 │
-├── data/                          # ✅ COMPLETED - Data storage
+├── data/                          # Data storage - local file system
 │   ├── README.md                  # Data structure documentation
 │   ├── raw/                       # Original SCANIA CSV files (existing)
 │   ├── processed/                 # Preprocessed data
 │   ├── models/                    # Trained model artifacts
 │   │   ├── registry.json          # Model registry
 │   │   ├── current/               # Current production model
-│   │   └── v1_YYYYMMDD_HHMMSS/   # Versioned models
+│   │   └── v1_YYYYMMDD_HHMMSS/    # Versioned models
 │   ├── predictions/               # Prediction results (JSON)
 │   └── cache/                     # Cached SHAP values
 │
@@ -49,7 +49,7 @@ predictive-maintenance-trucks/
 └── docs/                          # Existing documentation
 ```
 
-## 📦 Core Module Architecture (✅ COMPLETED)
+## 📦 Core Module Architecture
 
 ### 1. `core/pipeline.py`
 
@@ -126,19 +126,19 @@ loaded = manager.load_latest_model()
 
 ```text
 ┌─────────────────────────────────────────────────────┐
-│  scripts/train_model.py or test_pipeline.py        │
+│  scripts/train_model.py or test_pipeline.py         │
 │                                                     │
-│  1. TrainingPipeline.run_full_pipeline()           │
+│  1. TrainingPipeline.run_full_pipeline()            │
 │     ↓                                               │
-│  2. Load data from data/raw/                       │
+│  2. Load data from data/raw/                        │
 │     ↓                                               │
-│  3. Train XGBoost model                            │
+│  3. Train XGBoost model                             │
 │     ↓                                               │
-│  4. Evaluate & calculate cost savings              │
+│  4. Evaluate & calculate cost savings               │
 │     ↓                                               │
-│  5. ModelManager.save_model()                      │
+│  5. ModelManager.save_model()                       │
 │     ↓                                               │
-│  6. Model saved to data/models/v1_TIMESTAMP/       │
+│  6. Model saved to data/models/v1_TIMESTAMP/        │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -146,30 +146,25 @@ loaded = manager.load_latest_model()
 
 ```text
 ┌─────────────────────────────────────────────────────┐
-│  app.py (FastAPI) - [FUTURE]                       │
+│  app.py (FastAPI)                                   │
 │                                                     │
 │  On startup:                                        │
-│  1. PredictionPipeline.load_model()                │
+│  1. PredictionPipeline.load_model()                 │
 │     ↓                                               │
-│  2. Model loaded from data/models/current/         │
+│  2. Model loaded from data/models/current/          │
 │                                                     │
 │  Per request:                                       │
-│  3. POST /api/v1/predict                           │
+│  3. POST /api/v1/predict                            │
 │     ↓                                               │
-│  4. pipeline.predict_single(vehicle_data)          │
+│  4. pipeline.predict_single(vehicle_data)           │
 │     ↓                                               │
-│  5. Return JSON response with risk level           │
+│  5. Return JSON response with risk level            │
 └─────────────────────────────────────────────────────┘
 ```
 
 ## 🎯 Microservices Architecture
 
-### Current Status: **Monolithic Core** ✅
-
-- All ML logic in `core/` package
-- Easy to refactor into microservices later
-
-### Future Microservices Design
+### Microservices Design
 
 ```text
 ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
@@ -226,48 +221,7 @@ loaded = manager.load_latest_model()
 }
 ```
 
-## 🚀 Next Steps
-
-### Phase 1: Core ✅ COMPLETED
-
-- [x] Create `core/` folder structure
-- [x] Implement `model_manager.py`
-- [x] Implement `pipeline.py`
-- [x] Move existing modules to `core/`
-- [x] Create `data/` subfolders
-- [x] Test pipeline functionality
-
-### Phase 2: API Layer (NEXT)
-
-- [ ] Create `api/` folder structure
-- [ ] Implement FastAPI application (`app.py`)
-- [ ] Create prediction endpoints
-- [ ] Create explanation endpoints
-- [ ] Add health check endpoints
-- [ ] Test API with Postman/curl
-
-### Phase 3: Frontend
-
-- [ ] Initialize Angular project in `frontend/`
-- [ ] Create dashboard component
-- [ ] Create vehicle detail view
-- [ ] Implement API service for backend calls
-- [ ] Add charts for cost analysis
-
-### Phase 4: Deployment
-
-- [ ] Dockerize API and frontend
-- [ ] Create Docker Compose setup
-- [ ] Add CI/CD pipeline
-- [ ] Deploy to cloud (AWS/Azure)
-
 ## 🔧 Development Commands
-
-### Test Core Pipeline
-
-```bash
-python test_pipeline.py
-```
 
 ### Train New Model
 
@@ -337,6 +291,3 @@ for model in models:
 6. **Maintainability**: Clear structure, well-documented modules
 
 ---
-
-**Status**: ✅ Core pipeline complete and tested!  
-**Next**: Build API layer with FastAPI

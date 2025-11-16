@@ -72,24 +72,6 @@ venv\Scripts\activate  # Windows
 pip install -r requirements.txt
 ```
 
-### Test the Pipeline
-
-```bash
-# Run comprehensive tests
-python test_pipeline.py
-```
-
-Expected output:
-
-```text
-✓ Training pipeline test PASSED
-✓ Model manager test PASSED
-✓ Prediction pipeline test PASSED
-
-Tests passed: 3/3
-✓ ALL TESTS PASSED! Core pipeline is ready.
-```
-
 ## 📊 Usage Examples
 
 ### 1. Train a Model
@@ -253,41 +235,6 @@ This system uses the **SCANIA trucks Air Pressure System (APS)** dataset:
 
 - `aps_failure_training_set.csv` (or individual SCANIA CSVs)
 
-**Citation:** Scania CV AB, IDA 2016 Challenge Dataset
-
-## 🚧 Roadmap
-
-### Phase 1: Core ✅ COMPLETED
-
-- [x] Pipeline orchestration (TrainingPipeline, PredictionPipeline)
-- [x] Model versioning with JSON registry
-- [x] Cost-sensitive learning
-- [x] SHAP explainability
-- [x] Comprehensive tests
-
-### Phase 2: API Layer (Next)
-
-- [ ] FastAPI application (`app.py`)
-- [ ] Prediction endpoints (POST /predict)
-- [ ] Explanation endpoints (GET /explain)
-- [ ] Model management endpoints
-- [ ] Health checks & metrics
-
-### Phase 3: Frontend
-
-- [ ] Angular 15+ application
-- [ ] Fleet dashboard with risk overview
-- [ ] Vehicle detail view with SHAP plots
-- [ ] Cost analysis visualization
-- [ ] Batch upload for CSV predictions
-
-### Phase 4: Deployment
-
-- [ ] Docker containerization
-- [ ] Docker Compose orchestration
-- [ ] CI/CD pipeline (GitHub Actions)
-- [ ] Cloud deployment (AWS/Azure)
-
 ## 🛠️ Development Commands
 
 ```bash
@@ -340,7 +287,7 @@ Scaled to 1,000 vehicles: $2.4M annual savings
 
 ## 🤝 Contributing
 
-This is a structured, production-ready codebase:
+This is a structured codebase:
 
 1. **Core logic** in `core/` (no mixing with API/UI)
 2. **Tests** ensure reliability
@@ -392,6 +339,4 @@ For questions or collaboration:
 
 ---
 
-**Status:** ✅ Core pipeline complete and tested  
-**Next Step:** Build API layer with FastAPI  
 **Built for:** Army XEM, fleet management, predictive maintenance applications
