@@ -159,7 +159,7 @@ metadata = loaded['metadata']
 5. Model stored: data/models/v1_TIMESTAMP/
 ```
 
-### Prediction Flow (Online - Future API)
+### Prediction Flow (Online)
 
 ```text
 1. API loads pre-trained model at startup
