@@ -1,6 +1,8 @@
 # Predictive Maintenance - Fullstack Application
-
 [![Python](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/downloads/)
+[![Angular](https://img.shields.io/badge/Angular-20-red.svg)](https://angular.io/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com/)
+[![XGBoost](https://img.shields.io/badge/XGBoost-ML-orange.svg)](https://xgboost.readthedocs.io/)
 [![Architecture](https://img.shields.io/badge/architecture-microservices--ready-green.svg)](./ARCHITECTURE.md)
 
 A working prototye fullstack predictive maintenance system with ML pipeline, REST API, and Angular frontend. Built for Armored Brigade Combat Teams (ABCT)s predictive vehicle maintenance.
