@@ -226,7 +226,7 @@ Top Risk Drivers:
 
 ## 📊 Dataset: SCANIA Component X
 
-This system uses the **SCANIA trucks Air Pressure System (APS)** dataset:
+This system uses the **SCANIA Component X** dataset:
 
 - **Vehicles:** 33,640 trucks
 - **Features:** 170 sensor readings + specifications
