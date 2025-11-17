@@ -3,7 +3,7 @@
 [![Python](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/downloads/)
 [![Architecture](https://img.shields.io/badge/architecture-microservices--ready-green.svg)](./ARCHITECTURE.md)
 
-A production-ready fullstack predictive maintenance system with ML pipeline, REST API (planned), and Angular frontend (planned). Built for Army XEM and fleet management applications.
+A production-ready fullstack predictive maintenance system with ML pipeline, REST API (planned), and Angular frontend (planned). Built for Armored Brigade Combat Teams (ABCT)s predictive vehicle maintenance.
 
 ## 🎯 Overview
 
@@ -252,12 +252,11 @@ python -c "from core.model_manager import ModelManager; m = ModelManager(); prin
 
 ## 🎯 Business Value
 
-### For Army XEM / Fleet Management
+### For Fleet Management
 
 1. **Increased Readiness**: Predict failures before they occur → maximize availability
-2. **Cost Savings**: 39% reduction via optimal maintenance threshold
-3. **Explainability**: Commanders know WHY vehicles are at risk
-4. **Data-Driven**: Replace arbitrary schedules with scientific predictions
+2. **Explainability**: Commanders know WHY vehicles are at risk
+3. **Data-Driven**: Replace arbitrary schedules with scientific predictions
 
 ### ROI Calculation Example
 
@@ -339,4 +338,4 @@ For questions or collaboration:
 
 ---
 
-**Built for:** Army XEM, fleet management, predictive maintenance applications
+**Built for:** US Army Armored Brigade Combat Teams (ABCT)s - predictive maintenance applications
