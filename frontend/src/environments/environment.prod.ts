@@ -1,5 +1,5 @@
 // Production environment configuration
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:8000' // Update with production API URL
+  apiUrl: 'https://tanks.gatewaysolutions.com'
 };

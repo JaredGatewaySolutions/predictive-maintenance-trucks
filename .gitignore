@@ -231,6 +231,9 @@ data/predictions/*.json
 data/cache/*
 !data/cache/.gitkeep
 
+# Fleet data
+data/fleets/*
+
 # Frontend build artifacts (for future Angular app)
 frontend/node_modules/
 frontend/dist/
