@@ -3,7 +3,7 @@
 [![Python](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/downloads/)
 [![Architecture](https://img.shields.io/badge/architecture-microservices--ready-green.svg)](./ARCHITECTURE.md)
 
-A production-ready fullstack predictive maintenance system with ML pipeline, REST API (planned), and Angular frontend (planned). Built for Armored Brigade Combat Teams (ABCT)s predictive vehicle maintenance.
+A working prototye fullstack predictive maintenance system with ML pipeline, REST API, and Angular frontend. Built for Armored Brigade Combat Teams (ABCT)s predictive vehicle maintenance.
 
 ## 🎯 Overview
 
@@ -11,7 +11,7 @@ This system predicts vehicle failures using **XGBoost** with cost-sensitive lear
 
 **Key Features:**
 
-- 🔮 **Risk Prediction**: 90%+ accuracy with cost-sensitive learning
+- 🔮 **Risk Prediction**: accuracy estimates with learning
 - 🔍 **Explainability**: SHAP values show WHY each vehicle is at risk
 - 📦 **Model Versioning**: Automatic versioning with metadata tracking
 - 🚀 **Microservices-Ready**: Clean separation of concerns (core/api/frontend)
@@ -21,22 +21,22 @@ This system predicts vehicle failures using **XGBoost** with cost-sensitive lear
 
 ```text
 predictive-maintenance-trucks/
-├── core/                      ✅ COMPLETE - ML business logic
+├── core/                      # ML business logic
 │   ├── pipeline.py            # TrainingPipeline & PredictionPipeline
 │   ├── model_manager.py       # Model versioning & persistence
 │   ├── risk_predictor.py      # XGBoost with cost-sensitive learning
 │   ├── explainability_analyzer.py  # SHAP explanations
 │   └── scania_loader.py       # Data ingestion
 │
-├── api/                       🔜 NEXT - FastAPI REST endpoints
-├── frontend/                  🔜 FUTURE - Angular dashboard
-├── data/                      ✅ COMPLETE - Organized storage
+├── api/                       # FastAPI REST endpoints
+├── frontend/                  # Angular dashboard
+├── data/                      # Organized storage
 │   ├── models/                # Versioned model artifacts
 │   ├── predictions/           # Prediction results (JSON)
 │   ├── processed/             # Preprocessed data
 │   └── cache/                 # Cached SHAP values
 │
-├── test_pipeline.py           # Pipeline tests (all passing!)
+├── test_pipeline.py           # Pipeline tests
 └── ARCHITECTURE.md            # Detailed architecture docs
 ```
 
