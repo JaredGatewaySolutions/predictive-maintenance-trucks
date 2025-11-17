@@ -3,16 +3,16 @@
     <h1>ABCT Dashboard</h1>
     <div class="header-actions">
       @if (fleets().length > 0) {
-        <mat-form-field appearance="fill" class="abct-selector">
-          <mat-label>Select ABCT</mat-label>
-          <mat-select [(value)]="selectedFleet" (selectionChange)="selectFleet($event.value)">
-            @for (fleet of fleets(); track fleet.fleet_id) {
-              <mat-option [value]="fleet">
-                {{ fleet.fleet_name }} ({{ fleet.vehicle_count }} vehicles)
-              </mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
+      <mat-form-field appearance="fill" class="abct-selector">
+        <mat-label>Select ABCT</mat-label>
+        <mat-select [(value)]="selectedFleet" (selectionChange)="selectFleet($event.value)">
+          @for (fleet of fleets(); track fleet.fleet_id) {
+          <mat-option [value]="fleet">
+            {{ fleet.fleet_name }} ({{ fleet.vehicle_count }} vehicles)
+          </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
       }
       <button mat-raised-button color="primary" (click)="refresh()">
         <mat-icon>refresh</mat-icon>
@@ -22,37 +22,37 @@
   </div>
 
   @if (loading()) {
-    <div class="loading-container">
-      <mat-spinner></mat-spinner>
-      <p>Loading dashboard data...</p>
-    </div>
+  <div class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Loading dashboard data...</p>
+  </div>
   }
 
   @if (error()) {
-    <mat-card class="error-card">
-      <mat-card-content>
-        <mat-icon color="warn">error</mat-icon>
-        <p>{{ error() }}</p>
-      </mat-card-content>
-    </mat-card>
+  <mat-card class="error-card">
+    <mat-card-content>
+      <mat-icon color="warn">error</mat-icon>
+      <p>{{ error() }}</p>
+    </mat-card-content>
+  </mat-card>
   }
 
   @if (!loading() && !error() && hasNoFleets()) {
-    <mat-card class="empty-state-card">
-      <mat-card-content>
-        <mat-icon class="empty-icon">folder_open</mat-icon>
-        <h2>No ABCTs Found</h2>
-        <p>You haven't uploaded any ABCT data yet. Get started by uploading your first batch of vehicle data.</p>
-        <button mat-raised-button color="primary" routerLink="/batch-upload">
-          <mat-icon>upload</mat-icon>
-          Upload ABCT Data
-        </button>
-      </mat-card-content>
-    </mat-card>
+  <mat-card class="empty-state-card">
+    <mat-card-content>
+      <mat-icon class="empty-icon">folder_open</mat-icon>
+      <h2>No ABCTs Found</h2>
+      <p>You haven't uploaded any ABCT data yet. Get started by uploading your first batch of vehicle data.</p>
+      <button mat-raised-button color="primary" routerLink="/batch-upload">
+        <mat-icon>upload</mat-icon>
+        Upload ABCT Data
+      </button>
+    </mat-card-content>
+  </mat-card>
   }
 
   @if (!loading() && !error() && !hasNoFleets()) {
-    <!-- Model Metrics -->
+  <!-- Model Metrics
     <mat-card class="metrics-card">
       <mat-card-header>
         <mat-card-title>Model Performance</mat-card-title>
@@ -84,123 +84,118 @@
         }
       </mat-card-content>
     </mat-card>
-
-    <!-- Risk Summary -->
-    <div class="risk-summary-grid">
-      @if (riskSummary()) {
-        <mat-card class="risk-card high-risk">
-          <mat-card-content>
-            <mat-icon>warning</mat-icon>
-            <div class="risk-info">
-              <span class="risk-count">{{ riskSummary()!.high }}</span>
-              <span class="risk-label">High Risk</span>
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card class="risk-card medium-risk">
-          <mat-card-content>
-            <mat-icon>info</mat-icon>
-            <div class="risk-info">
-              <span class="risk-count">{{ riskSummary()!.medium }}</span>
-              <span class="risk-label">Medium Risk</span>
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card class="risk-card low-risk">
-          <mat-card-content>
-            <mat-icon>check_circle</mat-icon>
-            <div class="risk-info">
-              <span class="risk-count">{{ riskSummary()!.low }}</span>
-              <span class="risk-label">Low Risk</span>
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card class="risk-card total">
-          <mat-card-content>
-            <mat-icon>assessment</mat-icon>
-            <div class="risk-info">
-              <span class="risk-count">{{ riskSummary()!.total }}</span>
-              <span class="risk-label">Total Vehicles</span>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      }
-    </div>
-
-    <!-- Charts -->
-    <div class="charts-grid">
-      <mat-card class="chart-card">
-        <mat-card-header>
-          <mat-card-title>Risk Distribution</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          @if (riskChartData().length > 0) {
-            <ngx-charts-pie-chart
-              [results]="riskChartData()"
-              [scheme]="riskColorScheme"
-              [legend]="true"
-              [labels]="true"
-              [doughnut]="false">
-            </ngx-charts-pie-chart>
-          }
-        </mat-card-content>
-      </mat-card>
-
-    </div>
-
-    <!-- Fleet Vehicles -->
-    <mat-card class="table-card">
-      <mat-card-header>
-        <mat-card-title>Fleet Vehicles</mat-card-title>
-      </mat-card-header>
+  -->
+  <!-- Risk Summary -->
+  <div class="risk-summary-grid">
+    @if (riskSummary()) {
+    <mat-card class="risk-card high-risk">
       <mat-card-content>
-        <mat-form-field appearance="fill" class="filter-field">
-          <mat-label>Filter Vehicles</mat-label>
-          <input matInput (keyup)="applyFilter($event)" placeholder="Search by vehicle ID, risk level, etc." #input>
-          <mat-icon matPrefix>search</mat-icon>
-        </mat-form-field>
-
-        <table mat-table [dataSource]="dataSource" matSort class="risk-table clickable-table">
-          <ng-container matColumnDef="vehicle_id">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Vehicle ID</th>
-            <td mat-cell *matCellDef="let vehicle">{{ vehicle.vehicle_id }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="risk_level">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Risk Level</th>
-            <td mat-cell *matCellDef="let vehicle">
-              <span class="risk-badge" [ngClass]="'risk-' + vehicle.risk_level.toLowerCase()">
-                {{ vehicle.risk_level }}
-              </span>
-            </td>
-          </ng-container>
-
-          <ng-container matColumnDef="probability">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Probability</th>
-            <td mat-cell *matCellDef="let vehicle">{{ formatProbability(vehicle.probability) }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="timestamp">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Updated</th>
-            <td mat-cell *matCellDef="let vehicle">{{ formatDate(vehicle.timestamp) }}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td mat-cell *matCellDef="let vehicle">
-              <mat-icon>chevron_right</mat-icon>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-              (click)="navigateToVehicle(row)"
-              class="clickable-row"></tr>
-        </table>
+        <mat-icon>warning</mat-icon>
+        <div class="risk-info">
+          <span class="risk-count">{{ riskSummary()!.high }}</span>
+          <span class="risk-label">High Risk</span>
+        </div>
       </mat-card-content>
     </mat-card>
+
+    <mat-card class="risk-card medium-risk">
+      <mat-card-content>
+        <mat-icon>info</mat-icon>
+        <div class="risk-info">
+          <span class="risk-count">{{ riskSummary()!.medium }}</span>
+          <span class="risk-label">Medium Risk</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="risk-card low-risk">
+      <mat-card-content>
+        <mat-icon>check_circle</mat-icon>
+        <div class="risk-info">
+          <span class="risk-count">{{ riskSummary()!.low }}</span>
+          <span class="risk-label">Low Risk</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="risk-card total">
+      <mat-card-content>
+        <mat-icon>assessment</mat-icon>
+        <div class="risk-info">
+          <span class="risk-count">{{ riskSummary()!.total }}</span>
+          <span class="risk-label">Total Vehicles</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+    }
+  </div>
+
+  <!-- Charts -->
+  <div class="charts-grid">
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Risk Distribution</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @if (riskChartData().length > 0) {
+        <ngx-charts-pie-chart [results]="riskChartData()" [scheme]="riskColorScheme" [legend]="true" [labels]="true"
+          [doughnut]="false">
+        </ngx-charts-pie-chart>
+        }
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+
+  <!-- Fleet Vehicles -->
+  <mat-card class="table-card">
+    <mat-card-header>
+      <mat-card-title>Fleet Vehicles</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-form-field appearance="fill" class="filter-field">
+        <mat-label>Filter Vehicles</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Search by vehicle ID, risk level, etc." #input>
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+
+      <table mat-table [dataSource]="dataSource" matSort class="risk-table clickable-table">
+        <ng-container matColumnDef="vehicle_id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Vehicle ID</th>
+          <td mat-cell *matCellDef="let vehicle">{{ vehicle.vehicle_id }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="risk_level">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Risk Level</th>
+          <td mat-cell *matCellDef="let vehicle">
+            <span class="risk-badge" [ngClass]="'risk-' + vehicle.risk_level.toLowerCase()">
+              {{ vehicle.risk_level }}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="probability">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Probability</th>
+          <td mat-cell *matCellDef="let vehicle">{{ formatProbability(vehicle.probability) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="timestamp">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Updated</th>
+          <td mat-cell *matCellDef="let vehicle">{{ formatDate(vehicle.timestamp) }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let vehicle">
+            <mat-icon>chevron_right</mat-icon>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="navigateToVehicle(row)"
+          class="clickable-row"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
   }
 </div>
