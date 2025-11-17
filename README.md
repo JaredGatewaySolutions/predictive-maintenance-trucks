@@ -304,11 +304,11 @@ Want to add features? Fork and extend! Ideas:
 
 | Layer | Technology | Status |
 |-------|-----------|--------|
-| **Core ML** | Python 3.13, XGBoost, SHAP, scikit-learn | ✅ Complete |
-| **API** | FastAPI, Pydantic, Uvicorn | 🔜 Next |
-| **Frontend** | Angular 15+, Material Design | 🔜 Future |
-| **Storage** | JSON files (filesystem) | ✅ Complete |
-| **Deployment** | Docker, Docker Compose | 🔜 Future |
+| **Core ML** | Python 3.13, XGBoost, SHAP, scikit-learn
+| **API** | FastAPI, Pydantic, Uvicorn
+| **Frontend** | Angular 20+, Material Design
+| **Storage** | JSON files (filesystem)
+| **Deployment** | Docker, Docker Compose
 
 ## ⭐ Quick Reference
 
