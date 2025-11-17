@@ -7,7 +7,7 @@ A working prototye fullstack predictive maintenance system with ML pipeline, RES
 
 ## 🎯 Overview
 
-This system predicts vehicle failures using **XGBoost** with cost-sensitive learning, provides **SHAP-based explanations** for "why" predictions, and includes **model versioning** with JSON-based persistence. Designed for microservices deployment.
+This system predicts vehicle failures using **XGBoost** with sensitive learning, provides **SHAP-based explanations** for "why" predictions, and includes **model versioning** with JSON-based persistence. Designed for microservices deployment.
 
 **Key Features:**
 
